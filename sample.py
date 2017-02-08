@@ -1927,6 +1927,23 @@ def Logging(sample):
 	#print('	Clustering Coeff =', nx.average_clustering(graph))
 	print('-'*15)
 
+def SaveToFile(log):
+	log.save_to_file(log_file, log)
+
+
+def Append_Log(sample, type):
+	track_sort = _mylib.sortDictByKeys(sample._track)
+	cost_track = [x[0] for x in track_sort]
+	obs_track = [x[1] for x in track_sort]
+
+	if type not in Log_result:
+		Log_result[type] = obs_track
+	else:
+		Log_result[type] += (obs_track)
+
+	return cost_track
+
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-task', help='Type of sampling', default='undirected_single')
@@ -1969,7 +1986,7 @@ if __name__ == '__main__':
 	# elif mode == 9: exp_list = ['sb']
 
 	print(exp_list)
-
+	Log_result = {}
 
 	if args.task == 'undirected_single':
 		G = nx.read_edgelist(fname, delimiter=delimeter)
@@ -1992,10 +2009,22 @@ if __name__ == '__main__':
 			if starting_node == -1: starting_node = sample._query.randomNode()
 
 			print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
+
+
+
 			# Getting sample
 			sample.generate()
 			# End getting sample
 
-			Logging(sample)
+			cost_arr = Append_Log(sample, type)
+
+			#Logging(sample)
+
+		if 'budget' not in Log_result:
+			Log_result['budget'] = cost_arr
+		else:
+			Log_result['budget'] += (cost_arr)
 
 		starting_node = -1
+
+	Logging()

@@ -75,29 +75,10 @@ def log_new_nodes(fname, dataset, type, new_nodes, cost_track, budget, bfs_budge
 	#print('=' * 80, file=f)
 	#print(' ', file=f)
 
-def write_cost_spent_return(fname, dataset, budget, bfs_budget, exp_type, cost_spent, node_return):
+def save_to_file(fname, results):
 
-	if dataset is None or fname is None:
-		return None
-	f = open(fname, 'a')
+	cols = results.keys()
+	size = 
 
-	print('='*80, file=f)
-	print('Time: {}'.format(time.time()), file=f)
-	print('Dataset: {}'.format(dataset), file=f)
-	print('Budget: {}'.format(budget), file=f)
-	print('BFS budget: {}'.format(bfs_budget), file=f)
-	print('Expansion type: {}'.format(exp_type), file=f)
-	print('Cost spent, nodes return', file=f)
-	# for n in cost_spent:
-	# 	print(n, file=f)
-
-	print([round(x,4) for x in cost_spent], file=f)
-	print([round(x, 4) for x in node_return], file=f)
-
-
-	#print('Nodes return', file=f)
-	#print([round(x, 4) for x in node_return], file=f)
-	print('=' * 80, file=f)
-
-	
+	for col in cols:
 
