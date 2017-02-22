@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import collections
+import networkx2gt
+from graph_tool.all import *
 
 
 def logToFileCSV(data,filename,isAppend=False):
@@ -393,3 +395,19 @@ def calculate_density_ahn(g):
         density = 0.
     print(n, m, density)
     return density
+
+
+def create_gt_graph(g_nx):
+    edges = g_nx.edges()
+    edges = list(set(edges))
+
+    gt_graph = Graph(directed=0)
+    gt_graph.add_edge_list(edges, hashed=True)
+    return gt_graph
+
+def draw_graph_tool(g):
+    gt_graph = networkx2gt.nx2gt(g)
+
+    pos = sfdp_layout(gt_graph, max_iter=100, multilevel=True)
+
+    graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')

@@ -4,6 +4,7 @@ Logs data
 """
 from __future__ import print_function
 import time
+import os
 
 def writeUndirectedSingleLayer(fname, dataset, budget, bfs_budget,\
  cost_expansion, cost_densification, exp_cut_off, den_cut_off, sample,\
@@ -76,9 +77,25 @@ def log_new_nodes(fname, dataset, type, new_nodes, cost_track, budget, bfs_budge
 	#print(' ', file=f)
 
 def save_to_file(fname, results):
-
 	cols = results.keys()
-	size = 
+	size = len(results[cols[0]])
 
-	for col in cols:
+	txt = ''
+	if not os.path.isfile(fname):
+		txt = str(cols).replace('[', '')
+		txt = str(txt).replace(']', '')
+		txt = str(txt).replace('\'', '')
+
+	f = open(fname, 'a')
+	if txt != '':
+		print(txt, file=f)
+
+	for i in range(0,size):
+		line = []
+		for col in cols:
+			line.append(results[col][i])
+
+		txt = str(line).replace('[','')
+		txt = str(txt).replace(']', '')
+		print(txt, file=f)
 

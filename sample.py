@@ -35,12 +35,11 @@ class UndirectedSingleLayer(object):
 	"""
 
 
-	def __init__(self, query, oracle, budget=100, bfs_count=10, exp_type='oracle', dataset=None, logfile=None,k=5,cost=False, log_int=10):
+	def __init__(self, query, budget=100, bfs_count=10, exp_type='oracle', dataset=None, logfile=None,k=5,cost=False, log_int=10):
 		super(UndirectedSingleLayer, self).__init__()
 		self._budget = budget 			# Total budget for sampling
 		self._bfs_count = bfs_count 	# Portion of the budget to be used for initial bfs
 		self._query = query 			# Query object
-		self._oracle = oracle 			# Oracle object
 		self._dataset = dataset 		# Name of the dataset used; Used for logging and caching
 		self._logfile = logfile 		# Name of the file to write log to
 		self._exp_type = exp_type
@@ -1927,8 +1926,8 @@ def Logging(sample):
 	#print('	Clustering Coeff =', nx.average_clustering(graph))
 	print('-'*15)
 
-def SaveToFile(log):
-	log.save_to_file(log_file, log)
+def SaveToFile(results):
+	log.save_to_file(log_file, results)
 
 
 def Append_Log(sample, type):
@@ -1994,7 +1993,7 @@ if __name__ == '__main__':
 		graph = max(nx.connected_component_subgraphs(G), key=len)
 		print('LCC: # nodes', graph.number_of_nodes())
 		query = query.UndirectedSingleLayer(graph)
-		oracle = oracle.Oracle(graph, dataset)
+		#oracle = oracle.Oracle(graph, dataset)
 		log_file = log_file + dataset + '.txt'
 
 	for i in range(0, int(args.experiment)):
@@ -2002,9 +2001,10 @@ if __name__ == '__main__':
 
 		tmp = []
 		for type in exp_list:
-			sample = UndirectedSingleLayer(query, oracle, budget, \
-										   bfs_budget, type, dataset, log, k, is_cost,
-										   log_interval)
+			# sample = UndirectedSingleLayer(query, oracle, budget, \
+			# 							   bfs_budget, type, dataset, log, k, is_cost,
+			# 							   log_interval)
+			sample = UndirectedSingleLayer(query, budget, bfs_budget, type, dataset, log, k, is_cost, log_interval)
 
 			if starting_node == -1: starting_node = sample._query.randomNode()
 
@@ -2027,4 +2027,5 @@ if __name__ == '__main__':
 
 		starting_node = -1
 
-	Logging()
+	SaveToFile(Log_result)
+	# Logging(sample)

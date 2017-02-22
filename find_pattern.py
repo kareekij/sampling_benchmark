@@ -84,11 +84,17 @@ if __name__ == '__main__':
 
 	#G = nx.read_edgelist('./data/gen_models/' + dataset + '_pc.txt')
 	#G = nx.read_edgelist('./data/mix-param/0.8/network.dat')
-	G = nx.read_edgelist('./data/gen_models/pa_5000_9.txt')
+	G = nx.read_edgelist('./data/com-size/100/network.dat')
 	print(nx.info(G))
+
+	d = G.degree()
+	print(min(d.values()))
+	print(max(d.values()))
 	cc = nx.average_clustering(G)
+
 	print('CC:', cc)
-	community.best_partition(G)
+	p = community.best_partition(G)
+	print(len(set(p.values())))
 	#print('Avg Path:', nx.average_shortest_path_length(G))
 	#deg = G.degree()
 	#_mylib.degreeHist(deg.values())
