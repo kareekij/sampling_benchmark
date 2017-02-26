@@ -405,9 +405,48 @@ def create_gt_graph(g_nx):
     gt_graph.add_edge_list(edges, hashed=True)
     return gt_graph
 
-def draw_graph_tool(g):
+def draw_graph_tool_ori(g):
     gt_graph = networkx2gt.nx2gt(g)
 
     pos = sfdp_layout(gt_graph, max_iter=100, multilevel=True)
 
-    graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')
+    graph_draw(gt_graph, pos, output_size=(10000, 10000), output='./draw/networks/network_' + str(time.time()) + '.pdf')
+    # graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')
+
+def draw_graph_tool(g, first_l):
+    d_t = {}
+    for n in g.nodes():
+        if n in set(first_l):
+            d_t[n] = 100
+        else:
+            d_t[n] = 0
+	#
+	#
+    nx.set_node_attributes(g, 'first', d_t)
+
+
+    gt_graph = networkx2gt.nx2gt(g)
+
+
+    print gt_graph.list_properties()
+    prop = gt_graph.vertex_properties["first"]
+
+
+    print(len(set(first_l)), g.number_of_nodes())
+    #print(set(first_l).difference(set(g.nodes())))
+
+   # prop = gt_graph.new_vertex_property("int32_t")
+    #deg = gt_graph.degree_property_map("in")
+
+    # for n in set(first_l):
+    #     print(n)
+    #     prop[gt_graph.vertex(n)] = 100
+
+    # for v in gt_graph.vertices():
+    #     print(v)
+
+
+    pos = sfdp_layout(gt_graph, max_iter=100, multilevel=True)
+
+    graph_draw(gt_graph, pos,vertex_fill_color=prop, output_size=(10000, 10000), output='./draw/networks/network_' + str(time.time()) + '.pdf')
+    # graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')
