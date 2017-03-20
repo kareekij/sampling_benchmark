@@ -99,3 +99,25 @@ def save_to_file(fname, results):
 		txt = str(txt).replace(']', '')
 		print(txt, file=f)
 
+def save_to_file_nn(fname, results):
+	cols = results.keys()
+	size = len(results[cols[0]])
+
+	txt = ''
+	if not os.path.isfile(fname):
+		txt = str(cols).replace('[', '')
+		txt = str(txt).replace(']', '')
+		txt = str(txt).replace('\'', '')
+
+	f = open(fname, 'a')
+	if txt != '':
+		print(txt, file=f)
+
+	for i in range(0,size):
+		line = []
+		for col in cols:
+			line.append(results[col][i])
+
+		txt = str(line).replace('[','')
+		txt = str(txt).replace(']', '')
+		print(txt, file=f)

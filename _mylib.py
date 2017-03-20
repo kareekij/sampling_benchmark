@@ -10,6 +10,7 @@ import networkx as nx
 import collections
 import networkx2gt
 from graph_tool.all import *
+import random
 
 
 def logToFileCSV(data,filename,isAppend=False):
@@ -28,6 +29,29 @@ def sortDictByKeys(dict,reverse=False):
     d = dict.copy()
     od = collections.OrderedDict(sorted(d.items(), reverse=reverse))
     return od.items()
+
+def pickMaxValueFromDict(d):
+    max_val = max(d.values())
+    np_score = np.array(d.values())
+    max_idx = np.where(np_score == max_val)[0]
+    sel = random.choice(max_idx)
+    key = d.keys()[sel]
+    return key
+
+def pickMinValueFromDict(d):
+    min_score = min(d.values())
+    np_score = np.array(d.values())
+    mix_idx = np.where(np_score == min_score)[0]
+
+    sel = random.choice(mix_idx)
+
+    key = d.keys()[sel]
+    return key
+
+def removekey(d, key):
+    r = dict(d)
+    del r[key]
+    return r
 
 def plotLineGraph(lines,legend=None,title=None,x_axis_text=None, y_axis_text=None,save=True, log=True):
 
@@ -169,8 +193,8 @@ def ccPlotHist(nrows, ncols, plot, titles=None,save=False,bins=10):
 
 def scatterPlot(x, y, xlabels=None, ylabels=None, title=None,save=False):
     plt.plot(x, y, 'ro')
-    plt.xscale('log', nonposy='clip')
-    plt.yscale('log', nonposy='clip')
+   # plt.xscale('log', nonposy='clip')
+    #plt.yscale('log', nonposy='clip')
 
     plt.xlabel(xlabels)
     plt.ylabel(ylabels)
@@ -410,16 +434,16 @@ def draw_graph_tool_ori(g):
 
     pos = sfdp_layout(gt_graph, max_iter=100, multilevel=True)
 
-    graph_draw(gt_graph, pos, output_size=(10000, 10000), output='./draw/networks/network_' + str(time.time()) + '.pdf')
+    graph_draw(gt_graph, pos, output_size=(500, 500), output='./draw/networks/network_' + str(time.time()) + '.png')
     # graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')
 
 def draw_graph_tool(g, first_l):
     d_t = {}
     for n in g.nodes():
         if n in set(first_l):
-            d_t[n] = 100
+            d_t[n] = 50
         else:
-            d_t[n] = 0
+            d_t[n] = 20
 	#
 	#
     nx.set_node_attributes(g, 'first', d_t)
@@ -448,5 +472,38 @@ def draw_graph_tool(g, first_l):
 
     pos = sfdp_layout(gt_graph, max_iter=100, multilevel=True)
 
-    graph_draw(gt_graph, pos,vertex_fill_color=prop, output_size=(10000, 10000), output='./draw/networks/network_' + str(time.time()) + '.pdf')
+    graph_draw(gt_graph, pos,vertex_size=prop, vertex_fill_color=prop, output_size=(10000, 10000), output='./draw/networks/network_' + str(time.time()) + '.pdf')
     # graph_draw(gt_graph, pos, output_size=(1000, 1000), output='./draw/networks/network_' + str(time.time()) + '.png')
+
+def read_mtx_file(fname):
+    file = open(fname, "r")
+    edges_list = []
+    for i, line in enumerate(file.readlines()):
+        s = (line[0])
+        if s == "%":
+            print(line)
+            continue
+        line = str.replace(line, '\n', '')
+        line = str.replace(line, ',', ' ')
+        tmp = line.split(' ')[:2]
+        #print(tmp)
+
+        edges_list.append(tuple(tmp))
+
+    #print(edges_list)
+    return edges_list
+
+def read_file(fname):
+    ext = fname.split('.')[-1]
+
+    print(' Reading.. {} format'.format(ext))
+    if ext == 'mtx' or ext == 'edges':
+        edges_list = read_mtx_file(fname)
+        G = nx.Graph()
+        G.add_edges_from(edges_list)
+
+    # elif ext == 'edges':
+    #     G = nx.read_edgelist(fname, comments="%")
+    else:
+        G = nx.read_edgelist(fname)
+    return G

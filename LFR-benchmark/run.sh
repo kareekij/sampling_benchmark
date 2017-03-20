@@ -17,7 +17,7 @@ while [ $counter -le $gen_model_count ]
 do
   echo "Generating LFR Model" $counter
 
-  DIRECTORY="gen/$name/$counter"
+  DIRECTORY="gen-mix-0.6/$name/$counter"
 
   if [ ! -d "$DIRECTORY" ];then
     echo $DIRECTORY

@@ -35,23 +35,37 @@ if __name__ == '__main__':
 	is_directed = args.directed
 
 	print(args)
+	G = _mylib.read_file(fname)
+	_mylib.draw_graph_tool_ori(G)
+	#
+	# if is_directed:
+	# 	G = nx.read_edgelist(fname,create_using=nx.DiGraph())
+	# else:
+	# 	G = nx.read_edgelist(fname)
+	#
+	# if is_lcc:
+	# 	G = max(nx.weakly_connected_component_subgraphs(G), key=len)
+	# 	#G = max(nx.connected_component_subgraphs(G), key=len)
+	#
+	#
+	#
+	#
+	# first_l = set()
+	# with open(fname, 'rb') as csvfile:
+	#
+	# 	spamreader = csv.reader(csvfile, delimiter=' ')
+	#
+	# 	for row in spamreader:
+	# 		first_l.add(row[0])
+	#
+	# sub_g = G.subgraph(first_l)
+	# print(sub_g.number_of_nodes())
+	# print(sub_g.number_of_edges())
+	#
+	# _mylib.draw_graph_tool_ori(sub_g)
 
-	if is_directed:
-		G = nx.read_edgelist(fname,create_using=nx.DiGraph())
-	else:
-		G = nx.read_edgelist(fname)
-
-	if is_lcc:
-		G = max(nx.connected_component_subgraphs(G), key=len)
+	# _mylib.draw_graph_tool(G, list(first_l))
 
 
-	first_l = set()
-	with open(fname, 'rb') as csvfile:
-
-		spamreader = csv.reader(csvfile, delimiter=' ')
-
-		for row in spamreader:
-			first_l.add(row[0])
-
-
-	_mylib.draw_graph_tool(G, list(first_l))
+	# for g in sorted(nx.weakly_connected_component_subgraphs(G),reverse=True):
+	# 	_mylib.draw_graph_tool(g, list(first_l))
