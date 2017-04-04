@@ -1920,109 +1920,177 @@ def Append_Log(sample, type):
 
 	return cost_track
 
+def read_com_file(com_fname):
+	partition = {}
+	# with open('./data/com-5000-'+type+'.dat', 'rb') as csvfile:
+	with open(com_fname, 'rb') as csvfile:
+		r = csv.reader(csvfile, delimiter='\t')
+		for row in r:
+			partition[row[0]] = row[1]
+
+	return partition
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-task', help='Type of sampling', default='undirected_single')
-	parser.add_argument('fname', help='Edgelist file', type=str)
-	parser.add_argument('-budget', help='Total budget', type=int, default=0)
-	parser.add_argument('-bfs_budget', help='Bfs budget', type=int, default=5)
-	parser.add_argument('-dataset', help='Name of the dataset', default=None)
-	parser.add_argument('-log', help='Log file', default='./log/')
-	parser.add_argument('-experiment', help='# of experiment', default=10)
-	parser.add_argument('-log_interval', help='# of budget interval for logging', type=int, default=10)
-	parser.add_argument('-k', help='top k percent', type=int, default=5)
-	parser.add_argument('-is_cost', help='take cost in account', type=bool, default=True)
-	parser.add_argument('-mode', help='mode', type=int, default=1)
-	parser.add_argument('-delimiter', help='csv delimiter', type=str, default=None)
+	# parser = argparse.ArgumentParser()
+	# parser.add_argument('fname', help='Edgelist file', type=str)
+	# args = parser.parse_args()
 
-	args = parser.parse_args()
-
-	print(args)
-
-	fname = args.fname
-	budget = args.budget
-	bfs_budget = args.bfs_budget
-	dataset = args.dataset
-	log_file = args.log
-	k = args.k
-	is_cost = args.is_cost
-	log_interval = args.log_interval
-	mode = args.mode
-	delimeter = args.delimiter
+	fname = './LFR-benchmark/gen/multi-mixing-0.2/7/network.dat'
+	com_fname = './LFR-benchmark/gen/multi-mixing-0.2/7/community.dat'
 
 
-	if mode == 1:
-		exp_list = ['mod','rw','random','sb','bfs']
-	elif mode == 2:
-		exp_list = ['rw']
+	G = _mylib.read_file(fname)
+	p = read_com_file(com_fname)
+
+	Q_local = []
+	for id in set(p.values()):
+
+		members_c = set(_mylib.get_members_from_com(id,p))
+		members_not_c = set(G.nodes()).difference(members_c)
+
+		com_g = G.subgraph(members_c)
+		edge_in_com = com_g.number_of_edges()
+
+		edge_out = 0
+		border_nodes = set()
+		for node in members_c:
+			nbs = set(G.neighbors(node))
+			nbs_not_c = nbs.difference(members_c)
+			edge_out += len(nbs_not_c)
+			if len(nbs_not_c) != 0:
+				border_nodes.add(node)
+
+		b_edges = list(G.edges_iter(list(border_nodes)))
+
+		inter_edge = 0
+		for e in b_edges:
+			i_node = e[1]
+			if i_node in members_c:
+				inter_edge += 1
+			#t_nodes.add(e[1])
+
+		try:
+			r_score = inter_edge / len(b_edges)
+		except ZeroDivisionError:
+			r_score = 1.
 
 
-	print(exp_list)
-	Log_result = {}
-	Log_result_edges = {}
-	Log_result_nn = {}
+		r = (edge_in_com) / (edge_in_com + edge_out)
+		Q_local.append(r_score)
+		#print(r, r_score)
 
-	if dataset == None:
-		f = fname.split('.')[1].split('/')[-1]
-		dataset = f
+	Q_avg = np.mean(np.array(Q_local))
+	Q_sd = np.std(np.array(Q_local))
+	Q = community.modularity(p, G)
 
-	if args.task == 'undirected_single':
-		G = _mylib.read_file(fname)
+	print("Q= {}, Q_local= {}, sd={}".format(Q, Q_avg, Q_sd))
 
-		print('Original: # nodes', G.number_of_nodes())
-		graph = max(nx.connected_component_subgraphs(G), key=len)
-		print('LCC: # nodes', graph.number_of_nodes())
-		query = query.UndirectedSingleLayer(graph)
-		#oracle = oracle.Oracle(graph, dataset)
-		log_file_node = log_file + dataset + '_n.txt'
-		log_file_edge = log_file + dataset + '_e.txt'
-		log_file_order = log_file + dataset + '_order.txt'
 
-		#log_file = log_file + dataset + '_edges.txt'
-		#log_file = log_file + dataset + '.txt'
-		n = graph.number_of_nodes()
 
-		if budget == 0:
-			budget = int(.10*n)
-		print('{} Budget set to {} , n={}'.format(dataset, budget, n))
 
-	print(graph.number_of_nodes())
-	print(graph.number_of_edges())
 
-	for i in range(0, int(args.experiment)):
-		row = []
 
-		tmp = []
-		for type in exp_list:
-			# sample = UndirectedSingleLayer(query, oracle, budget, \
-			# 							   bfs_budget, type, dataset, log, k, is_cost,
-			# 							   log_interval)
-			sample = UndirectedSingleLayer(query, budget, bfs_budget, type, dataset, log, k, is_cost, log_interval)
-
-			if starting_node == -1: starting_node = sample._query.randomNode()
-
-			print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
-
-			# Getting sample
-			sample.generate()
-			# End getting sample
-
-			cost_arr = Append_Log(sample, type)
-			#_mylib.plotLineGraph([sample._track_new_nodes],title=type, log=False)
-
-		if 'budget' not in Log_result:
-			Log_result['budget'] = cost_arr
-			Log_result_edges['budget'] = cost_arr
-		else:
-			Log_result['budget'] += (cost_arr)
-			Log_result_edges['budget'] += (cost_arr)
-
-		if 'budget' not in Log_result_nn:
-			Log_result_nn['budget'] = range(1,len(sample._track_new_nodes)+1)
-		else:
-			Log_result_nn['budget'] += range(1,len(sample._track_new_nodes)+1)
-
-		starting_node = -1
-
-	SaveToFile(Log_result, Log_result_edges, Log_result_nn)
+# if __name__ == '__main__':
+# 	parser = argparse.ArgumentParser()
+# 	parser.add_argument('-task', help='Type of sampling', default='undirected_single')
+# 	parser.add_argument('fname', help='Edgelist file', type=str)
+# 	parser.add_argument('-budget', help='Total budget', type=int, default=0)
+# 	parser.add_argument('-bfs_budget', help='Bfs budget', type=int, default=5)
+# 	parser.add_argument('-dataset', help='Name of the dataset', default=None)
+# 	parser.add_argument('-log', help='Log file', default='./log/')
+# 	parser.add_argument('-experiment', help='# of experiment', default=10)
+# 	parser.add_argument('-log_interval', help='# of budget interval for logging', type=int, default=10)
+# 	parser.add_argument('-k', help='top k percent', type=int, default=5)
+# 	parser.add_argument('-is_cost', help='take cost in account', type=bool, default=True)
+# 	parser.add_argument('-mode', help='mode', type=int, default=1)
+# 	parser.add_argument('-delimiter', help='csv delimiter', type=str, default=None)
+#
+# 	args = parser.parse_args()
+#
+# 	print(args)
+#
+# 	fname = args.fname
+# 	budget = args.budget
+# 	bfs_budget = args.bfs_budget
+# 	dataset = args.dataset
+# 	log_file = args.log
+# 	k = args.k
+# 	is_cost = args.is_cost
+# 	log_interval = args.log_interval
+# 	mode = args.mode
+# 	delimeter = args.delimiter
+#
+#
+# 	if mode == 1:
+# 		exp_list = ['mod','rw','random','sb','bfs']
+# 	elif mode == 2:
+# 		exp_list = ['rw']
+#
+#
+# 	print(exp_list)
+# 	Log_result = {}
+# 	Log_result_edges = {}
+# 	Log_result_nn = {}
+#
+# 	if dataset == None:
+# 		f = fname.split('.')[1].split('/')[2]
+# 		dataset = f
+#
+# 	if args.task == 'undirected_single':
+# 		G = _mylib.read_file(fname)
+#
+# 		print('Original: # nodes', G.number_of_nodes())
+# 		graph = max(nx.connected_component_subgraphs(G), key=len)
+# 		print('LCC: # nodes', graph.number_of_nodes())
+# 		query = query.UndirectedSingleLayer(graph)
+# 		#oracle = oracle.Oracle(graph, dataset)
+# 		log_file_node = log_file + dataset + '_n.txt'
+# 		log_file_edge = log_file + dataset + '_e.txt'
+# 		log_file_order = log_file + dataset + '_order.txt'
+#
+# 		#log_file = log_file + dataset + '_edges.txt'
+# 		#log_file = log_file + dataset + '.txt'
+# 		n = graph.number_of_nodes()
+#
+# 		if budget == 0:
+# 			budget = int(.10*n)
+# 		print('{} Budget set to {} , n={}'.format(dataset, budget, n))
+#
+# 	print(graph.number_of_nodes())
+# 	print(graph.number_of_edges())
+#
+# 	for i in range(0, int(args.experiment)):
+# 		row = []
+#
+# 		tmp = []
+# 		for type in exp_list:
+# 			# sample = UndirectedSingleLayer(query, oracle, budget, \
+# 			# 							   bfs_budget, type, dataset, log, k, is_cost,
+# 			# 							   log_interval)
+# 			sample = UndirectedSingleLayer(query, budget, bfs_budget, type, dataset, log, k, is_cost, log_interval)
+#
+# 			if starting_node == -1: starting_node = sample._query.randomNode()
+#
+# 			print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
+#
+# 			# Getting sample
+# 			sample.generate()
+# 			# End getting sample
+#
+# 			cost_arr = Append_Log(sample, type)
+#
+# 		if 'budget' not in Log_result:
+# 			Log_result['budget'] = cost_arr
+# 			Log_result_edges['budget'] = cost_arr
+# 		else:
+# 			Log_result['budget'] += (cost_arr)
+# 			Log_result_edges['budget'] += (cost_arr)
+#
+# 		if 'budget' not in Log_result_nn:
+# 			Log_result_nn['budget'] = range(1,len(sample._track_new_nodes)+1)
+# 		else:
+# 			Log_result_nn['budget'] += range(1,len(sample._track_new_nodes)+1)
+#
+# 		starting_node = -1
+#
+# 	SaveToFile(Log_result, Log_result_edges, Log_result_nn)
