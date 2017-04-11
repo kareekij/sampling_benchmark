@@ -49,7 +49,7 @@ def SaveToFile(results):
 
 	log.save_to_file(log_file, results)
 
-def simmulate(steps):
+def simulate(steps):
 	com_steps = []
 	new_node_steps = []
 	ratio_found_steps = []
@@ -74,6 +74,32 @@ def simmulate(steps):
 		ratio_found_steps.append(ratio_found)
 
 	return sample_graph, com_steps, new_node_steps, ratio_found_steps
+
+def simulate_new_nodes(steps):
+	com_steps = []
+	new_node_steps = []
+	ratio_found_steps = []
+
+	# Start simulating.
+	for i, step in enumerate(steps):
+		# Track current community
+		cur_com = p[step]
+
+
+		nodes, edges, c = query.neighbors(str(step))
+		new_nodes = set(nodes).difference(sample_graph.nodes())
+
+
+		for e in edges:
+			sample_graph.add_edge(e[0], e[1])
+
+		if i % 10 == 0:
+			com_steps.append(cur_com)
+			new_node_steps.append(len(new_nodes))
+
+
+	return sample_graph, com_steps, new_node_steps
+
 
 def get_communities(G, dataset):
 	com_fname = './data/pickle/communities_{}.pickle'.format(dataset)
@@ -111,6 +137,22 @@ def write_to_file(fn, com_steps, new_node_steps, ratio_found_steps, trial):
 	f = open(fn, 'a')
 	for i in range(0, size):
 		print('{}, {}, {}, {}, {}'.format(steps[i], com_steps[i], new_node_steps[i], ratio_found_steps[i], trial) , file=f)
+
+
+def write_to_file_nn(fn, com_steps, new_node_steps, trial):
+	size = len(com_steps)
+	steps = range(1, size+1)
+
+
+	if not os.path.isfile(fn):
+		f = open(fn, 'a')
+		print('window, label, new_nodes, trial', file=f)
+		f.close()
+
+	f = open(fn, 'a')
+	for i in range(0, size):
+		print('{}, {}, {}, {}'.format(steps[i], com_steps[i], new_node_steps[i], trial) , file=f)
+
 
 def get_members(graph, p):
 	d = {}
@@ -158,7 +200,7 @@ if __name__ == '__main__':
 	print(graph.number_of_nodes())
 
 	if type == 'mod':
-		idx = 5
+		idx = 3
 	elif type == 'rw':
 		idx = 0
 
@@ -179,20 +221,20 @@ if __name__ == '__main__':
 			sample_graph = nx.Graph()
 
 			queried_nodes = (np.array(steps, dtype=str).tolist())
-			sample_graph, com_steps, new_node_steps, ratio_found_steps = simmulate(queried_nodes)
+			#sample_graph, com_steps, new_node_steps, ratio_found_steps = simulate(queried_nodes)
+			sample_graph, com_steps, new_node_steps = simulate_new_nodes(queried_nodes)
+
 
 			nodes_count = sample_graph.number_of_nodes()
 			edges_count = sample_graph.number_of_edges()
 
 			print('	nodes: {} edge: {}'.format(nodes_count, edges_count))
 
-			# nodes_count_all.append(nodes_count)
-			# edges_count_all.append(edges_count)
-			#
+
 			com_steps = label_reordering(com_steps)
 
-			write_to_file('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, ratio_found_steps, trial)
-
+			#write_to_file('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, ratio_found_steps, trial)
+			write_to_file_nn('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, trial)
 
 
 

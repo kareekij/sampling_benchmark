@@ -76,6 +76,10 @@ class UndirectedSingleLayer(object):
 		self._track_cc = {}
 		self._track_new_nodes = []
 
+		self._track_hyb_samp = []
+		self._track_hyb_samp_nn = []
+		self._track_hyb_samp_threshold = []
+
 		self._track_k = []
 		self._track_open= []
 
@@ -91,6 +95,9 @@ class UndirectedSingleLayer(object):
 		self._X = []
 		self._Y = []
 
+		self._WINDOW_SIZE = 10
+		self._PREV = 100
+		self._SAMP = 1
 
 
 	def _expansion_random(self, candidate_list):
@@ -1274,11 +1281,9 @@ class UndirectedSingleLayer(object):
 				nodes, edges, c = self._query.neighbors(current_node)
 				# Candidate nodes are the (open) neighbors of current node
 				candidates = list(set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-				print("RW: getting stuck")
+				print(' Walking.. {} neighbors'.format(len(nodes)))
 
 			current_node = random.choice(candidates)
-
-
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -1288,60 +1293,6 @@ class UndirectedSingleLayer(object):
 		new_nodes = set(nodes).difference(current_nodes)
 		c = len(new_nodes)
 		self._track_new_nodes.append(current)
-
-
-
-	def _random_walk_max(self):
-		current_node = random.choice(list(self._sample['nodes']['open']))
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-			self._increment_cost(c)
-
-			# Candidate nodes are the (open) neighbors of current node
-			candidates = list(
-				set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-
-			while len(candidates) == 0:
-				current_node = self._choose_next_node(list(nodes))
-				# Query the neighbors of current
-				nodes, edges, c = self._query.neighbors(current_node)
-				# Candidate nodes are the (open) neighbors of current node
-				candidates = list(
-					set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-				print("RW: getting stuck")
-
-			#current_node = random.choice(candidates)
-			current_node = self._choose_next_node(candidates)
-
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
-	def _choose_next_node(self, candidates):
-		avg_cc = nx.average_clustering(self._sample_graph)
-		deg_cand = self._sample_graph.degree(candidates)
-
-		P_max = avg_cc
-		rand = random.uniform(0,1)
-
-		if rand <= P_max:
-			selected_node = self._pick_max_score(deg_cand)
-		else:
-			selected_node = random.choice(candidates)
-
-		return selected_node
 
 	def _test(self):
 		candidates = self._sample['nodes']['open']
@@ -1637,19 +1588,25 @@ class UndirectedSingleLayer(object):
 
 		return logistic
 
-	def _test_algo(self):
+	def _hybrid(self):
 		current_node = starting_node
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
 		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
 
+		is_MOD = True
+		new_nodes_step = []
+
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-
-			close_n = sub_sample['nodes']['close']
-
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
+			# For tracking
+			self._count_new_nodes(nodes, current_node)
+
+			# New nodes found
+			new_nodes = set(nodes).difference(set(self._sample_graph.nodes()))
+			new_nodes_step.append(len(new_nodes))
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1658,39 +1615,100 @@ class UndirectedSingleLayer(object):
 			for e in edges:
 				self._sample_graph.add_edge(e[0], e[1])
 			# Update the cost
-
 			self._increment_cost(c)
 
-			all_closed_nodes = sub_sample['nodes']['close'].union(self._sample['nodes']['close'])
+			if len(new_nodes_step) % self._WINDOW_SIZE == 0:
+				is_MOD = self._decision_making(new_nodes_step)
 
-			# Candidate nodes are the (open) neighbors of current node.
-			candidates = list(set(nodes).difference(all_closed_nodes))
+			# TODO: Need some criteria to switch between MOD and RW !
+			if is_MOD:
+				#print(' -- MOD {} neighbors {} new nodes'.format(len(nodes), len(new_nodes)))
+				closed_nodes = set(sub_sample['nodes']['close']).union(set(self._sample['nodes']['close']))
+				open_nodes = set(self._sample_graph.nodes()).difference(closed_nodes)
 
-			TELEPORT_P = 0.1
-			# If not randomly pick one neighbors and look at its neighbors instead
-			while len(candidates) == 0:
-				r = random.uniform(0,1)
-				if r <= TELEPORT_P:
-					current_node = self._get_max_open_nbs_node(all_closed_nodes)
-				else:
-					current_node = random.choice(list(nodes))
+				deg = self._sample_graph.degree(open_nodes)
+				deg_sorted =  _mylib.sortDictByValues(deg,reverse=True)
 
-				# Query the neighbors of current
-				#nodes, edges, c = self._query.neighbors(current_node)
-				nodes = self._sample_graph.neighbors(current_node)
-				# Candidate nodes are the (open) neighbors of current node
-				candidates = list(set(nodes).difference(all_closed_nodes))
-				print("Test Algo: Move to neighbor")
-
-			r = random.uniform(0, 1)
-			if r <= TELEPORT_P:
-				current_node = self._get_max_open_nbs_node(all_closed_nodes)
+				current_node = deg_sorted[0][0]
 			else:
-				current_node = random.choice(candidates)
+				if len(new_nodes_step) % 10 == 0:
+					if self._track_hyb_samp[-2] != -1:
+						closed_nodes = set(sub_sample['nodes']['close']).union(set(self._sample['nodes']['close']))
+						current_node = random.choice(list(closed_nodes))
+						# Query the neighbors of current
+						nodes, edges, c = self._query.neighbors(current_node)
+						# Candidate nodes are the (open) neighbors of current node
+						new_nodes = list(
+							set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 
+
+				candidates = new_nodes
+				while len(candidates) == 0:
+					current_node = random.choice(list(nodes))
+					# Query the neighbors of current
+					nodes, edges, c = self._query.neighbors(current_node)
+					# Candidate nodes are the (open) neighbors of current node
+					candidates = list(
+						set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
+					#print(' ---- Walking.. {} neighbors'.format(len(nodes)))
+
+				current_node = random.choice(list(candidates))
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
+
+	def _decision_making(self, steps):
+		D = 0.15
+		WINDOW_SIZE = self._WINDOW_SIZE
+		curr_window = np.array(steps[-WINDOW_SIZE:])
+		prev_window = np.array(steps[-(2*WINDOW_SIZE):-WINDOW_SIZE])
+		t = len(steps)
+
+		curr_window_sum = np.sum(curr_window)
+		prev_window_sum = np.sum(prev_window)
+
+		self._track_hyb_samp_nn.append(curr_window_sum)
+		self._track_hyb_samp.append(self._SAMP)
+
+		if t == self._WINDOW_SIZE:
+			self._PREV = (curr_window_sum)
+			self._track_hyb_samp_threshold.append(0)
+			return True
+
+		#THRESHOLD = math.log((self._PREV * math.pow((1 - D), (t / WINDOW_SIZE))))
+		exponent = (t/WINDOW_SIZE)
+		THRESHOLD = int(self._PREV * math.exp(-exponent/200))
+
+		self._track_hyb_samp_threshold.append(THRESHOLD)
+		self._PREV = np.mean(np.array(self._track_hyb_samp_nn[:-1] ))#THRESHOLD #curr_window_sum
+
+		if curr_window_sum < THRESHOLD:
+			self._SAMP = self._SAMP * -1
+
+
+		if self._SAMP == -1:
+			print(' RW! sum {} .. threshold {}'.format(curr_window_sum, THRESHOLD))
+			return False
+		elif self._SAMP == 1:
+			print(' MOD! sum {} .. threshold {}'.format(curr_window_sum, THRESHOLD))
+			return True
+
+
+		#peaks = len(np.where(curr_window > T)[0])
+
+
+		#if math.fabs( np.sum(np.array(curr_window)) - np.sum(np.array(prev_window)) ) < T:
+
+
+		# if len(steps) > WINDOW_SIZE:
+		# 	s = steps[-WINDOW_SIZE:]
+		# 	sum = np.sum(np.array(s))
+		# 	if sum < SUM_AMOUNT:
+		# 		return False
+
+		#return True
+
+
 
 	def _get_max_open_nbs_node(self, close_n):
 
@@ -1856,8 +1874,8 @@ class UndirectedSingleLayer(object):
 					self._snowball_sampling()
 				elif self._exp_type == 'bfs':
 					self._bfs()
-				elif self._exp_type == 'test':
-					self._test_algo()
+				elif self._exp_type == 'hybrid':
+					self._hybrid()
 				else:
 					current_list = self._densification(current)
 					#current_list = self._densification_max_score(current)
@@ -1894,10 +1912,13 @@ def Logging(sample):
 	#print('	Clustering Coeff =', nx.average_clustering(graph))
 	print('-'*15)
 
-def SaveToFile(results_nodes,results_edges, query_order):
+def SaveToFile(results_nodes,results_edges, query_order, results_hyb):
 	log.save_to_file(log_file_node, results_nodes)
 	log.save_to_file(log_file_edge, results_edges)
 	log.save_to_file(log_file_order, query_order)
+	if len(results_hyb) != 0:
+		log.save_to_file(log_file_hyb, results_hyb)
+
 
 def Append_Log(sample, type):
 	track_sort = _mylib.sortDictByKeys(sample._track)
@@ -1919,6 +1940,20 @@ def Append_Log(sample, type):
 		Log_result_nn[type] += sample._track_new_nodes
 
 	return cost_track
+
+def Append_Log_Hybrid(sample, trial):
+	a = len(sample._track_hyb_samp)
+	trial_l = [trial] * int(a)
+	windows = [x for x in xrange(1,int(a)+1)]
+
+	#if len(Log_result_hyb) == 0:
+	Log_result_hyb['mode'] = Log_result_hyb.get('mode',[]) + sample._track_hyb_samp
+	Log_result_hyb['new_nodes'] = Log_result_hyb.get('new_nodes', []) + sample._track_hyb_samp_nn
+	Log_result_hyb['trial'] = Log_result_hyb.get('trial', []) + trial_l
+	Log_result_hyb['window'] = Log_result_hyb.get('window', []) + windows
+	Log_result_hyb['threshold'] = Log_result_hyb.get('threshold', []) + sample._track_hyb_samp_threshold
+
+
 
 
 if __name__ == '__main__':
@@ -1953,7 +1988,8 @@ if __name__ == '__main__':
 
 
 	if mode == 1:
-		exp_list = ['mod','rw','random','sb','bfs']
+		#exp_list = ['mod','rw','random','sb','bfs']
+		exp_list = ['mod','rw', 'hybrid']
 	elif mode == 2:
 		exp_list = ['rw']
 
@@ -1962,6 +1998,8 @@ if __name__ == '__main__':
 	Log_result = {}
 	Log_result_edges = {}
 	Log_result_nn = {}
+
+	Log_result_hyb = {}
 
 	if dataset == None:
 		f = fname.split('.')[1].split('/')[-1]
@@ -1978,6 +2016,7 @@ if __name__ == '__main__':
 		log_file_node = log_file + dataset + '_n.txt'
 		log_file_edge = log_file + dataset + '_e.txt'
 		log_file_order = log_file + dataset + '_order.txt'
+		log_file_hyb = log_file + dataset + '_hyb.txt'
 
 		#log_file = log_file + dataset + '_edges.txt'
 		#log_file = log_file + dataset + '.txt'
@@ -2009,7 +2048,9 @@ if __name__ == '__main__':
 			# End getting sample
 
 			cost_arr = Append_Log(sample, type)
-			#_mylib.plotLineGraph([sample._track_new_nodes],title=type, log=False)
+
+			if type == 'hybrid':
+				Append_Log_Hybrid(sample, i)
 
 		if 'budget' not in Log_result:
 			Log_result['budget'] = cost_arr
@@ -2025,4 +2066,4 @@ if __name__ == '__main__':
 
 		starting_node = -1
 
-	SaveToFile(Log_result, Log_result_edges, Log_result_nn)
+	SaveToFile(Log_result, Log_result_edges, Log_result_nn, Log_result_hyb)
