@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="349b1696-223a-4689-83f7-e71b11445264" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/query.py" afterPath="$PROJECT_DIR$/query.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sample.py" afterPath="$PROJECT_DIR$/sample.py" />
     </list>
     <ignored path="sampling_benchmark.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -723,7 +721,14 @@
       <option name="project" value="LOCAL" />
       <updated>1491313506451</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="high-low page rank score">
+      <created>1492184385148</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1492184385148</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -812,7 +817,8 @@
     <MESSAGE value="sync Feb21" />
     <MESSAGE value="update gitignore" />
     <MESSAGE value="Add local com, gen-edge step com obs." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add local com, gen-edge step com obs." />
+    <MESSAGE value="high-low page rank score" />
+    <option name="LAST_COMMIT_MESSAGE" value="high-low page rank score" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
