@@ -1269,6 +1269,11 @@ class UndirectedSingleLayer(object):
 			# Add edges to sub_graph
 			for e in edges:
 				self._sample_graph.add_edge(e[0], e[1])
+
+			local_q = self.calculate_local_modularity(sub_sample['nodes']['close'])
+			local_q_step.append(local_q)
+
+
 			# Update the cost
 			self._increment_cost(c)
 
@@ -1294,17 +1299,12 @@ class UndirectedSingleLayer(object):
 		c = len(new_nodes)
 		self._track_new_nodes.append(current)
 
-	def _test(self):
-		candidates = self._sample['nodes']['open']
-		degree_observed = self._sample_graph.degree(candidates)
-		degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-		current_node = degree_observed_sorted[0][0]
+	def _top_k_rank(self):
+		current_node = starting_node
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
 		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		P_MOD = 0.5
 
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 
@@ -1312,13 +1312,7 @@ class UndirectedSingleLayer(object):
 
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
-
-			#cc_node = nx.clustering(self._sample_graph, current_node)
-			average_cc = nx.average_clustering(self._sample_graph)
-			try:
-				average_cc_close = nx.average_clustering(self._sample_graph.subgraph(close_n))
-			except ZeroDivisionError:
-				average_cc_close = 0.
+			self._count_new_nodes(nodes, current_node)
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1326,27 +1320,48 @@ class UndirectedSingleLayer(object):
 			# Add edges to sub_graph
 			for e in edges:
 				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
 
+			local_q = self.calculate_local_modularity(sub_sample['nodes']['close'])
+			local_q_step.append(local_q)
+
+			# Update the cost
 			self._increment_cost(c)
 
 			candidates = list(
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
 					self._sample['nodes']['close']))
 
-			r = random.uniform(0,1)
+			top_k = self.getTop_k_rank(candidates,k=20)
+			current_node = random.choice(top_k)
 
-			if r < P_MOD:
-				current_node = random.choice(candidates)
-			else:
-				degree_observed = self._sample_graph.degree(candidates)
-				degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-				current_node = degree_observed_sorted[0][0]
-
-			print(' [test] current cc: {} {}'.format(average_cc, average_cc_close))
+			# top_k = self.getTop_k_pagerank(candidates)
+			# current_node = top_k
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
+
+	def getTop_k_rank(self,candidates,k=10):
+		degree_observed = self._sample_graph.degree(candidates)
+		degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
+		top_k_size = int((k/100.)*len(degree_observed))
+		if top_k_size == 0: top_k_size = 1
+
+		top_k = [x[0] for x in degree_observed_sorted[:top_k_size] ]
+
+		print(" {} percent, total {} ".format(k,top_k_size))
+		return top_k
+
+	def getTop_k_pagerank(self,candidates):
+		pr = nx.pagerank(self._sample_graph)
+
+		closed_nodes = set(self._sample_graph) - set(candidates)
+		for key in list(closed_nodes):
+			if key in pr:
+				del pr[key]
+
+		pr_sorted = _mylib.sortDictByValues(pr, reverse=True)
+		#print(pr_sorted)
+		return pr_sorted[0][0]
 
 	def _max_obs_deg(self):
 		current_node = starting_node
@@ -1370,8 +1385,11 @@ class UndirectedSingleLayer(object):
 			# Add edges to sub_graph
 			for e in edges:
 				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
 
+			local_q = self.calculate_local_modularity(sub_sample['nodes']['close'])
+			local_q_step.append(local_q)
+
+			# Update the cost
 			self._increment_cost(c)
 
 			candidates = list(
@@ -1385,6 +1403,57 @@ class UndirectedSingleLayer(object):
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
+
+	def _max_excess_deg(self):
+		current_node = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+
+			close_n = sub_sample['nodes']['close']
+
+			# Query the neighbors of current
+			nodes, edges, c = self._query.neighbors(current_node)
+			self._count_new_nodes(nodes, current_node)
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+
+			local_q = self.calculate_local_modularity(sub_sample['nodes']['close'])
+			local_q_step.append(local_q)
+
+			# Update the cost
+			self._increment_cost(c)
+
+			candidates = list(
+				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
+					self._sample['nodes']['close']))
+
+			deg = self._calculate_excess_deg(candidates)
+			deg_sorted = _mylib.sortDictByValues(deg, reverse=True)
+			current_node = deg_sorted[0][0]
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
+	def _calculate_excess_deg(self, candidates):
+		degree_observed = self._sample_graph.degree(candidates)
+		degree_true = self._query.getTrueDegree(candidates)
+
+		degree_excess = {}
+		for k,v in degree_true.iteritems():
+			deg = degree_true[k] - degree_observed[k]
+			degree_excess[k] = deg
+
+		return degree_excess
+
 
 	def _max_score(self):
 		candidates = self._sample['nodes']['open']
@@ -1866,6 +1935,8 @@ class UndirectedSingleLayer(object):
 					self._random_walk()
 				elif self._exp_type == 'mod':
 					self._max_obs_deg()
+				elif self._exp_type == 'med':
+					self._max_excess_deg()
 				elif self._exp_type == 'max-score':
 					self._max_score()
 				elif self._exp_type == 'oracle':
@@ -1876,13 +1947,19 @@ class UndirectedSingleLayer(object):
 					self._bfs()
 				elif self._exp_type == 'hybrid':
 					self._hybrid()
+				elif self._exp_type == 'topk':
+							self._top_k_rank()
 				else:
 					current_list = self._densification(current)
 					#current_list = self._densification_max_score(current)
 
 				self._densi_count += 1
 
-				print('			Budget spent: {}/{}'.format(self._cost, self._budget))
+
+
+
+
+sdlkfjlsjdflkjsdf				print('			Budget spent: {}/{}'.format(self._cost, self._budget))
 
 			print('			Number of nodes \t Close: {} \t Open: {}'.format( \
 				len(self._sample['nodes']['close']), \
@@ -1895,6 +1972,34 @@ class UndirectedSingleLayer(object):
 			repititions = repititions - len(self._oracle._communities_selected)
 			print(self._oracle._communities_selected, len(self._oracle._communities_selected), repititions)
 			"""
+
+
+	def calculate_local_modularity(self, closed_nodes):
+		nodes = self._sample_graph.nodes()
+
+		border_nodes = set()
+		for c in closed_nodes:
+			nbs = self._sample_graph.neighbors(c)
+			open_nbs = set(nbs) - set(closed_nodes)
+			if len(open_nbs) != 0:
+				border_nodes.add(c)
+
+		b_edges = list(G.edges_iter(list(border_nodes)))
+
+		# Iterate throught every edges of border nodes
+		inter_edge = 0
+		for e in b_edges:
+			i_node = e[1]
+			if i_node in closed_nodes:
+				inter_edge += 1
+
+		# Calculate local modularity
+		try:
+			r_score = inter_edge / len(b_edges)
+		except ZeroDivisionError:
+			r_score = 1.
+
+		return r_score
 
 
 def Logging(sample):
@@ -1988,8 +2093,8 @@ if __name__ == '__main__':
 
 
 	if mode == 1:
-		#exp_list = ['mod','rw','random','sb','bfs']
-		exp_list = ['mod','rw', 'hybrid']
+		#exp_list = ['topk']
+		exp_list = ['mod','rw', 'med','topk']
 	elif mode == 2:
 		exp_list = ['rw']
 
@@ -2000,6 +2105,8 @@ if __name__ == '__main__':
 	Log_result_nn = {}
 
 	Log_result_hyb = {}
+
+	local_q_step = []
 
 	if dataset == None:
 		f = fname.split('.')[1].split('/')[-1]
@@ -2051,6 +2158,8 @@ if __name__ == '__main__':
 
 			if type == 'hybrid':
 				Append_Log_Hybrid(sample, i)
+
+			#_mylib.plotLineGraph([local_q_step])
 
 		if 'budget' not in Log_result:
 			Log_result['budget'] = cost_arr

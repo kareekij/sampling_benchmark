@@ -58,6 +58,12 @@ class UndirectedSingleLayer(object):
 		for n in deg_one_nodes:
 			print(cc[n])
 
+	def getTrueDegree(self, candidates=[]):
+		if len(candidates) == 0:
+			return self._graph.degree()
+
+		return self._graph.degree(candidates)
+
 
 		# deg_nb = 0
 		# while deg_nb !=2:
