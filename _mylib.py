@@ -507,3 +507,10 @@ def read_file(fname):
     else:
         G = nx.read_edgelist(fname)
     return G
+
+def get_keys_by_value(d, target_val=0):
+    keys = np.array(d.keys())
+    vals = np.array(d.values())
+
+    indices = np.where(vals == target_val)[0]
+    return keys[indices].tolist()

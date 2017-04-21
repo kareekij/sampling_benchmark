@@ -26,6 +26,7 @@ import Queue
 from scipy import stats
 
 from sklearn import linear_model
+from collections import defaultdict
 
 starting_node = -1
 
@@ -1145,15 +1146,15 @@ class UndirectedSingleLayer(object):
 			dict -- The updated sub sample
 		"""
 		try:
-
 			sub_sample['edges'].update(edges)
 			sub_sample['nodes']['close'].add(candidate)
 			sub_sample['nodes']['open'].remove(candidate)
 			sub_sample['nodes']['open'].update(\
 				nodes.difference(sub_sample['nodes']['close'])\
 				.difference(self._sample['nodes']['close']))
-		except KeyError:
-			print('		Err:')
+		except KeyError as e:
+			print('		Error update Subsample:', e, candidate)
+
 
 
 		return sub_sample
@@ -1294,31 +1295,296 @@ class UndirectedSingleLayer(object):
 		c = len(new_nodes)
 		self._track_new_nodes.append(current)
 
-	def _test(self):
-		candidates = self._sample['nodes']['open']
-		degree_observed = self._sample_graph.degree(candidates)
-		degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-		current_node = degree_observed_sorted[0][0]
+	def _bandit(self):
+		# Initialize graph with Random Walk
+		close_n = self._init_bandit_g_rw()
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+
+		# Start Bandit algorithm
+		arms, node2arm = self._get_arms(close_n)
+
+		bandit = {'arms': arms,
+				  'score': dict.fromkeys(arms.keys(), float('inf')),
+				  'count': dict.fromkeys(arms.keys(), 0),
+				  'created_at': dict.fromkeys(arms.keys(), 0),
+				  'rewards': defaultdict(list),
+				  'node2arm': node2arm}
+
+		# Initialize score for each arm
+		for k,v in bandit['arms'].iteritems():
+			count = len(k.split('.')) - 1
+			bandit['score'][k] = count
+			#bandit['score'][k] = (1 / count) * len(v)
+
+
+		# Pick fist arm
+		max_score = max(bandit['score'].values())
+		candidate_arms = _mylib.get_keys_by_value(bandit['score'], max_score)
+		current_arm = random.choice(candidate_arms)
+		members = bandit['arms'][current_arm]
+		current_node = random.choice(members)
+
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+		sub_sample['nodes']['close'].update(close_n)
+		iter_count = 1
+
+
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+			# Query on the selected node
+			nodes, edges, c = self._query.neighbors(current_node)
+			new_nodes = set(nodes) - set(self._sample_graph.nodes())
+			closed_nodes = self._sample['nodes']['close'] | sub_sample['nodes']['close']
+
+			# Update bandit
+			bandit = self._update_arms(bandit, current_node, current_arm, nodes, closed_nodes, iter_count)
+
+			# For tracking
+			self._count_new_nodes(nodes, current_node)
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+
+			# Update the cost
+			self._increment_cost(c)
+
+			bandit = self._update_score(bandit, iter_count)
+			#tmp = self._get_arms_members_more_than(bandit)
+			#new_dict = {k: v for k, v in bandit['score'].items() if k in tmp}
+			#max_score = max(new_dict.values())
+			max_score = max(bandit['score'].values())
+
+			candidate_arms = _mylib.get_keys_by_value(bandit['score'], max_score)
+			current_arm = random.choice(candidate_arms)
+			members = bandit['arms'][current_arm]
+			current_node = self._pick_next_node(members)#random.choice(members)
+
+
+
+			#print('Max score: {}, Candidates: {}'.format(max_score, len(candidate_arms)))
+
+			iter_count += 1
+
+		self._updateSample(sub_sample)
+
+	def _pick_next_node(self, candidates):
+		return random.choice(candidates)
+		# pr = nx.pagerank(self._sample_graph, alpha=0.9)
+		#
+		# new_dict = {k: v for k, v in pr.items() if k in candidates}
+		#
+		# sorted_d = _mylib.sortDictByValues(new_dict,reverse=True)[0]
+		#
+		# #print(sorted_d, sorted_d[0])
+		#
+		# return sorted_d[0]
+
+	def _pr_graph_tool(self):
+		gt_graph = networkx2gt.nx2gt(self._sample_graph)
+		pr = graph_tool.centrality.pagerank(gt_graph)
+
+		max_node = candidates[0]
+		max_val = 0
+		for cand in candidates:
+			val = pr[gt_graph.vertex(int(cand))]
+			if val > max_val:
+				max_node = cand
+
+		return max_node
+
+
+
+	def _get_arms_members_more_than(self, bandit, k=10):
+		candidates = []
+		for key, members in bandit['arms'].iteritems():
+			mem_count = len(members)
+			if mem_count > k:
+				candidates.append(key)
+		return candidates
+
+	def _update_score(self, bandit, iter_count, CONSTANT_P = 150):
+
+
+		next_iter = iter_count + 1
+		CONSTANT_P = CONSTANT_P * math.exp(-(0.05 * next_iter))
+		#print(CONSTANT_P)
+
+		for arm_id, rewards in bandit['rewards'].iteritems():
+			avg_rewards = np.average(np.array(rewards))
+			#avg_rewards = np.average(np.array(rewards),weights=range(1, len(rewards) + 1))
+
+
+			created_at = bandit['created_at'][arm_id]
+			arm_picked_count = bandit['count'][arm_id] + 0.1
+
+			score = avg_rewards + \
+					(CONSTANT_P * math.sqrt( (2 * math.log(next_iter - created_at)) / arm_picked_count ))
+
+			#print(score, arm_picked_count, avg_rewards, rewards)
+			bandit['score'][arm_id] = score
+
+		return bandit
+
+	def _update_arms(self, bandit, current_node, current_arm, nbs, closed_nodes, iter_count):
+		#print('Update arms', iter_count)
+		C = 5
+		open_nodes = set(self._sample_graph.nodes()) - closed_nodes
+
+		# all nodes in current arm
+		members_in_arms = bandit['arms'][current_arm]
+		# nbs that are in the current arm
+		nbs_cur_arm = set(nbs).intersection(set(members_in_arms))
+		# nbs that are newly added nodes
+		new_nodes = set(nbs) - set(self._sample_graph.nodes())
+		# nbs that are not in the current arm
+		nbs_out_arm = (set(nbs) - nbs_cur_arm) & open_nodes
+
+		# nbs that are existing inside and outside current arm
+		nbs_in_out_arm = nbs_cur_arm & nbs_out_arm
+
+		#print('Nbs: {}, Current arm: {}/{}, Outside: {}, Newly added: {}'.format(len(nbs), len(nbs_cur_arm), len(members_in_arms), len(nbs_out_arm), len(new_nodes)))
+
+		# Update info of the current arm
+		# Remove current node from current arm
+		bandit['arms'][current_arm].remove(current_node)
+		bandit['node2arm'].pop(current_node, -1)
+		bandit['rewards'][current_arm].append(len(new_nodes))
+		bandit['count'][current_arm] += 1
+
+		avg_cur_arm_reward = np.mean(np.array(bandit['rewards'][current_arm]))
+		P = (len(new_nodes)+1) / len(nbs)
+		reward_4_new_arm = (P * avg_cur_arm_reward)
+
+		#print ('	Avg. Reward: {}, Score: {}, R4new: {}, P: {}'.format(avg_cur_arm_reward, bandit['score'][current_arm], reward_4_new_arm, P))
+
+		# For the case that current arm has one node and it is selected.
+		if len(bandit['arms'][current_arm]) == 0:
+			bandit['arms'].pop(current_arm)
+			bandit['score'].pop(current_arm)
+			bandit['count'].pop(current_arm)
+			bandit['created_at'].pop(current_arm)
+			bandit['rewards'].pop(current_arm)
+
+		# # CASE 1: New arm becuase current node has link with nodes in current arm
+		# for index, node in enumerate(nbs_cur_arm):
+		# 	# New arm id
+		# 	new_arm = current_arm + str(current_node) + '.'
+		# 	# Update arm id
+		# 	bandit['node2arm'][node] = new_arm
+		# 	# Add node to new arm
+		# 	bandit['arms'][new_arm].append(node)
+		# 	#bandit['score'][new_arm] = bandit['score'].get(new_arm, float('inf'))
+		# 	bandit['count'][new_arm] = 0
+		# 	bandit['created_at'][new_arm] = iter_count
+		# 	if index == 0:
+		# 		count = len(new_arm.split('.'))
+		# 		reward = reward_4_new_arm + ((1 - P) * (1/(count-1) ))
+		# 		bandit['rewards'].setdefault(new_arm, []).append(reward)
+		# 		bandit['score'][new_arm] = bandit['score'].get(new_arm, reward)
+		#
+		# 		#avg_cur_arm_reward = np.mean(np.array(bandit['rewards'][new_arm]))
+		# 		#bandit['score'][current_arm] = avg_cur_arm_reward
+		#
+		# 	# Remove node from current arm
+		# 	bandit['arms'][current_arm].remove(node)
+		#
+		# 	# If current Arm is disappear
+		# 	if len(bandit['arms'][current_arm]) == 0:
+		# 		bandit['arms'].pop(current_arm)
+		# 		bandit['score'].pop(current_arm)
+		# 		bandit['count'].pop(current_arm)
+		# 		bandit['created_at'].pop(current_arm)
+		# 		bandit['rewards'].pop(current_arm)
+
+		# CASE 2: New arm becuase of newly added nodes
+		for index, node in enumerate(new_nodes):
+			# New arm id
+			new_arm = str(current_node) + '.'
+			# Update arm id
+			bandit['node2arm'][node] = new_arm
+			# Update arm info
+			bandit['arms'][new_arm].append(node)
+
+			if index == len(new_nodes) - 1:
+				close_count = len(new_arm.split('.')) - 1
+				reward = reward_4_new_arm + ((1 - P) * ((close_count)))
+				#reward = reward_4_new_arm + ((1 - P) * (len(new_nodes) / (close_count)))
+
+				bandit['rewards'].setdefault(new_arm, []).append(reward)
+				bandit['created_at'][new_arm] = bandit['created_at'].get(new_arm, iter_count)
+				bandit['count'][new_arm] = bandit['count'].get(new_arm, 0)
+
+
+		# CASE 3: New arm becuase current node connects with nodes outside.
+		for index, node in enumerate(nbs_in_out_arm):
+			# Current arm of particular node
+			node_arm = bandit['node2arm'][node]
+			# New arm id
+			new_arm = node_arm + str(current_node) + '.'
+			# Update arm id
+			bandit['node2arm'][node] = new_arm
+			# Add node to new arm
+			bandit['arms'][new_arm].append(node)
+
+			bandit['count'][new_arm] = bandit['count'].get(new_arm, 0)
+			bandit['created_at'][new_arm] = bandit['created_at'].get(new_arm, iter_count)
+
+			#bandit['rewards'].setdefault(new_arm, []).append(reward)
+
+			close_count = len(new_arm.split('.')) - 1
+			node_in_arms = len(bandit['arms'][new_arm])
+			reward = reward_4_new_arm + ((1 - P) * (close_count))
+			#reward = reward_4_new_arm + ((1 - P) * (node_in_arms/close_count) )
+			bandit['rewards'][new_arm] = [reward]
+
+			# Remove node from current arm
+			bandit['arms'][node_arm].remove(node)
+
+			# If current Arm is disappear
+			if len(bandit['arms'][node_arm]) == 0:
+				bandit['arms'].pop(node_arm)
+				bandit['score'].pop(node_arm, -1)
+				bandit['count'].pop(node_arm)
+				bandit['created_at'].pop(node_arm)
+				bandit['rewards'].pop(node_arm, -1)
+
+		return bandit
+
+	def _get_arms(self, close_n):
+		sample_g = self._sample_graph
+		open_nodes = set(sample_g.nodes()) - close_n
+
+		arms = defaultdict(list)
+		node2arm = dict()
+
+		for o_n in open_nodes:
+			nbs = sample_g.neighbors(o_n)
+			key = ''
+			for x in nbs:
+				key += x +'.'
+
+			arms[key].append(o_n)
+			node2arm[o_n] = key
+
+		print(len(node2arm), len(open_nodes))
+		return arms, node2arm
+
+	def _init_bandit_g_rw(self, START_BUDGET = 10):
+		current_node = starting_node
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
 
-		P_MOD = 0.5
-
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-
-			close_n = sub_sample['nodes']['close']
-
+		while self._cost < START_BUDGET and len(sub_sample['nodes']['open']) > 0:
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
-
-			#cc_node = nx.clustering(self._sample_graph, current_node)
-			average_cc = nx.average_clustering(self._sample_graph)
-			try:
-				average_cc_close = nx.average_clustering(self._sample_graph.subgraph(close_n))
-			except ZeroDivisionError:
-				average_cc_close = 0.
+			# For tracking
+			self._count_new_nodes(nodes, current_node)
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1327,26 +1593,28 @@ class UndirectedSingleLayer(object):
 			for e in edges:
 				self._sample_graph.add_edge(e[0], e[1])
 			# Update the cost
-
 			self._increment_cost(c)
 
+			# Candidate nodes are the (open) neighbors of current node
 			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
-					self._sample['nodes']['close']))
+				set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 
-			r = random.uniform(0,1)
+			while len(candidates) == 0:
+				current_node = random.choice(list(nodes))
+				# Query the neighbors of current
+				nodes, edges, c = self._query.neighbors(current_node)
+				# Candidate nodes are the (open) neighbors of current node
+				candidates = list(
+					set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
+				print(' Walking.. {} neighbors'.format(len(nodes)))
 
-			if r < P_MOD:
-				current_node = random.choice(candidates)
-			else:
-				degree_observed = self._sample_graph.degree(candidates)
-				degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-				current_node = degree_observed_sorted[0][0]
-
-			print(' [test] current cc: {} {}'.format(average_cc, average_cc_close))
+			current_node = random.choice(candidates)
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
+		close_n = set(sub_sample['nodes']['close']) | set(self._sample['nodes']['close'])
+		return close_n
+
 
 	def _max_obs_deg(self):
 		current_node = starting_node
@@ -1693,23 +1961,6 @@ class UndirectedSingleLayer(object):
 			print(' MOD! sum {} .. threshold {}'.format(curr_window_sum, THRESHOLD))
 			return True
 
-
-		#peaks = len(np.where(curr_window > T)[0])
-
-
-		#if math.fabs( np.sum(np.array(curr_window)) - np.sum(np.array(prev_window)) ) < T:
-
-
-		# if len(steps) > WINDOW_SIZE:
-		# 	s = steps[-WINDOW_SIZE:]
-		# 	sum = np.sum(np.array(s))
-		# 	if sum < SUM_AMOUNT:
-		# 		return False
-
-		#return True
-
-
-
 	def _get_max_open_nbs_node(self, close_n):
 
 		count_n = {}
@@ -1723,7 +1974,6 @@ class UndirectedSingleLayer(object):
 
 		candidates = _mylib.get_members_from_com(max_count, count_n)
 		return random.choice(candidates)
-
 
 	def _getDenNodes(self, nodes):
 		"""
@@ -1876,9 +2126,8 @@ class UndirectedSingleLayer(object):
 					self._bfs()
 				elif self._exp_type == 'hybrid':
 					self._hybrid()
-				else:
-					current_list = self._densification(current)
-					#current_list = self._densification_max_score(current)
+				elif self._exp_type == 'vmab':
+					self._bandit()
 
 				self._densi_count += 1
 
@@ -1989,9 +2238,9 @@ if __name__ == '__main__':
 
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
-		exp_list = ['mod','rw', 'hybrid']
+		exp_list = ['mod','rw', 'vmab']
 	elif mode == 2:
-		exp_list = ['rw']
+		exp_list = ['vmab']
 
 
 	print(exp_list)
