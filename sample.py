@@ -1253,6 +1253,43 @@ class UndirectedSingleLayer(object):
 		# Updat the sample with the sub sample
 		self._updateSample(sub_sample)
 
+	def _dfs(self):
+		sub_sample = {'edges':set(), 'nodes':{'close':set(), 'open':set()}}
+
+		current = starting_node
+
+		sub_sample['nodes']['open'].add(current)
+		queue = [current]
+
+		# Run till bfs budget allocated or no nodes left in queue
+		while self._cost < self._budget and len(queue) > 0:
+			# Select the last node from queue (LIFO)
+			current = queue[-1]
+
+			# Get the neighbors - nodes and edges; and cost associated
+			nodes, edges, c = self._query.neighbors(current)
+			self._count_new_nodes(nodes, current)
+
+			self._increment_cost(c)
+
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+
+			# Remove the current node from queue
+			queue.remove(current)
+
+			# Update queue
+			nodes = nodes.difference(sub_sample['nodes']['close'])
+			nodes = nodes.difference(sub_sample['nodes']['open'])
+			queue += list(nodes)
+			queue = list(set(queue))
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current)
+
+		# Updat the sample with the sub sample
+		self._updateSample(sub_sample)
+
 	def _random_walk(self):
 		current_node = starting_node
 
@@ -1264,7 +1301,7 @@ class UndirectedSingleLayer(object):
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
 			# For tracking
-			self._count_new_nodes(nodes, current_node, rank)
+			self._count_new_nodes(nodes, current_node)
 
 
 			# Update the sub sample
@@ -1293,17 +1330,17 @@ class UndirectedSingleLayer(object):
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
 					self._sample['nodes']['close']))
 
-			rank = self._get_node_rank_from_excess_degree(current_node, open_nodes)
+			#rank = self._get_node_rank_from_excess_degree(current_node, open_nodes)
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 
-	def _count_new_nodes(self, nodes, current, rank=0):
+	def _count_new_nodes(self, nodes, current):
 		current_nodes = self._sample_graph.nodes()
 		new_nodes = set(nodes).difference(current_nodes)
 		c = len(new_nodes)
 		self._track_selected_node.append(current)
-		self._track_rank_selected.append(rank)
+		#self._track_rank_selected.append(rank)
 
 	def _bandit(self):
 		# Initialize graph with Random Walk
@@ -1352,9 +1389,6 @@ class UndirectedSingleLayer(object):
 			# Update bandit
 			bandit = self._update_arms(bandit, current_node, current_arm, nodes, closed_nodes, iter_count)
 
-			for node in nodes:
-				cash_count[node] = cash_count.get(node, 1 ) + (cash_count.get(current_node,1) / len(nodes))
-
 
 			# For tracking
 			self._count_new_nodes(nodes, current_node)
@@ -1375,8 +1409,8 @@ class UndirectedSingleLayer(object):
 			candidate_arms = _mylib.get_keys_by_value(bandit['score'], max_score)
 			current_arm = random.choice(candidate_arms)
 			members = bandit['arms'][current_arm]
-			#current_node = self._pick_next_node(members)#random.choice(members)
-			current_node = self._pick_next_node_from_cash(members, cash_count)
+			current_node = self._pick_next_node(members)
+
 
 			iter_count += 1
 
@@ -1420,11 +1454,11 @@ class UndirectedSingleLayer(object):
 				candidates.append(key)
 		return candidates
 
-	def _update_score(self, bandit, iter_count, CONSTANT_P = 150):
+	def _update_score(self, bandit, iter_count, CONSTANT_P = 50):
 
 
 		next_iter = iter_count + 1
-		CONSTANT_P = CONSTANT_P * math.exp(-(0.05 * next_iter))
+		#CONSTANT_P = CONSTANT_P * math.exp(-(0.05 * next_iter))
 		#print(CONSTANT_P)
 
 		for arm_id, rewards in bandit['rewards'].iteritems():
@@ -1633,7 +1667,7 @@ class UndirectedSingleLayer(object):
 		close_n = set(sub_sample['nodes']['close']) | set(self._sample['nodes']['close'])
 		return close_n, cash_count
 
-	def _cash_spread(self):
+	def _opic(self):
 		current_node = starting_node
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
@@ -1650,8 +1684,10 @@ class UndirectedSingleLayer(object):
 			nodes, edges, c = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node)
 
+			# For each neighbors, distribute current cash equally
+			# Any node starts with cash = 1
 			for c_n in nodes:
-				cash_count[c_n] = cash_count.get(c_n, 1) + (1 / len(nodes))
+				cash_count[c_n] = cash_count.get(c_n, 1) + (cash_count.get(current_node, 1) / len(nodes))
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1668,9 +1704,7 @@ class UndirectedSingleLayer(object):
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
 					self._sample['nodes']['close']))
 
-			#degree_observed = self._sample_graph.degree(candidates)
 			cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
-
 
 			for index,ccc in enumerate(cash_count_sorted):
 				if cash_count_sorted[index][0] in candidates:
@@ -1681,6 +1715,73 @@ class UndirectedSingleLayer(object):
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
+
+	def _pagerank(self):
+		current_node = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		rank = 0
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+
+			close_n = sub_sample['nodes']['close']
+
+			# Query the neighbors of current
+			nodes, edges, c = self._query.neighbors(current_node)
+			self._count_new_nodes(nodes, current_node)
+
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+			# Update the cost
+
+			self._increment_cost(c)
+
+			candidates = list(
+				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
+
+
+			pr = nx.pagerank(self._sample_graph)
+
+			pr_keys = np.array(pr.keys())
+			pr_vals = np.array(pr.values())
+
+			# Get index of all candidate nodes
+			ix = np.in1d(pr_keys.ravel(), candidates).reshape(pr_keys.shape)
+			#print(ix)
+			#print(np.where(ix))
+
+
+			max_val = np.amax(pr_vals[np.where(ix)])
+
+			max_val_index = np.where(pr_vals == max_val)
+
+
+
+			current_node = random.choice(list(pr_keys[max_val_index]))
+			#print('		Test', max_val, pr[current_node])
+			while current_node not in candidates:
+				current_node = random.choice(list(pr_keys[max_val_index]))
+				print(	' Re-pick .')
+
+
+
+
+			#pr_sorted = _mylib.sortDictByValues(pr, reverse=True)
+
+			#current_node = degree_observed_sorted[0][0]
+
+
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
 
 	def _max_obs_deg(self):
 		current_node = starting_node
@@ -1696,7 +1797,7 @@ class UndirectedSingleLayer(object):
 
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
-			self._count_new_nodes(nodes, current_node, rank)
+			self._count_new_nodes(nodes, current_node)
 
 
 			# Update the sub sample
@@ -1716,7 +1817,7 @@ class UndirectedSingleLayer(object):
 			degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
 			current_node = degree_observed_sorted[0][0]
 
-			rank = self._get_node_rank_from_excess_degree(current_node, candidates)
+			#rank = self._get_node_rank_from_excess_degree(current_node, candidates)
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -2245,7 +2346,7 @@ class UndirectedSingleLayer(object):
 		mean = np.mean(degree_excess_val)
 
 
-		print('Min {}, Max {}, Avg. {}'.format(min, max, mean))
+		#print('Min {}, Max {}, Avg. {}'.format(min, max, mean))
 
 		return avg_rank / len(candidates)
 
@@ -2291,30 +2392,34 @@ class UndirectedSingleLayer(object):
 
 				# Perform densification
 				self._stage = 'den'
-				if self._exp_type == 'random':
-					self.random_sampling()
-				elif self._exp_type == 'rw':
-					self._random_walk()
-				elif self._exp_type == 'mod':
-					self._max_obs_deg()
-				elif self._exp_type == 'med':
+
+				if self._exp_type == 'med':
 					self._max_excess_deg()
 				elif self._exp_type == 'max-score':
 					self._max_score()
 				elif self._exp_type == 'oracle':
 					current_list = self._densification_oracle(current)
+				elif self._exp_type == 'k-rank':
+					self._k_rank()
+				# Here
+				elif self._exp_type == 'rand':
+					self.random_sampling()
+				elif self._exp_type == 'rw':
+					self._random_walk()
+				elif self._exp_type == 'mod':
+					self._max_obs_deg()
 				elif self._exp_type == 'sb':
 					self._snowball_sampling()
 				elif self._exp_type == 'bfs':
 					self._bfs()
-				elif self._exp_type == 'hybrid':
-					self._hybrid()
+				elif self._exp_type == 'dfs':
+					self._dfs()
 				elif self._exp_type == 'vmab':
 					self._bandit()
-				elif self._exp_type == 'cash':
-					self._cash_spread()
-				elif self._exp_type == 'k-rank':
-					self._k_rank()
+				elif self._exp_type == 'opic':
+					self._opic()
+				elif self._exp_type == 'pr':
+					self._pagerank()
 
 
 				self._densi_count += 1
@@ -2427,8 +2532,9 @@ if __name__ == '__main__':
 
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
-		exp_list = ['med','mod','rw','k-rank']
-		#exp_list = ['k-rank','mod','rw']
+		#exp_list = ['med','mod','rw','k-rank']
+		#exp_list = ['pr','mod','rw']
+		exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab', 'pr']
 	elif mode == 2:
 		exp_list = ['vmab']
 
@@ -2490,9 +2596,6 @@ if __name__ == '__main__':
 			# End getting sample
 
 			cost_arr = Append_Log(sample, type)
-
-			if type == 'hybrid':
-				Append_Log_Hybrid(sample, i)
 
 		# if 'budget' not in Log_result:
 		# 	Log_result['budget'] = cost_arr
