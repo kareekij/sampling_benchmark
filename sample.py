@@ -26,7 +26,7 @@ import Queue
 from scipy import stats
 
 from sklearn import linear_model
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 starting_node = -1
 
@@ -76,6 +76,8 @@ class UndirectedSingleLayer(object):
 		self._track_edges = {}
 		self._track_cc = {}
 		self._track_new_nodes = []
+		self._track_selected_node = []
+		self._track_rank_selected = []
 
 		self._track_hyb_samp = []
 		self._track_hyb_samp_nn = []
@@ -1257,11 +1259,12 @@ class UndirectedSingleLayer(object):
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
 
+		rank=0
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
 			# For tracking
-			self._count_new_nodes(nodes, current_node)
+			self._count_new_nodes(nodes, current_node, rank)
 
 
 			# Update the sub sample
@@ -1286,18 +1289,25 @@ class UndirectedSingleLayer(object):
 
 			current_node = random.choice(candidates)
 
+			open_nodes = list(
+				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
+					self._sample['nodes']['close']))
+
+			rank = self._get_node_rank_from_excess_degree(current_node, open_nodes)
+
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 
-	def _count_new_nodes(self, nodes, current):
+	def _count_new_nodes(self, nodes, current, rank=0):
 		current_nodes = self._sample_graph.nodes()
 		new_nodes = set(nodes).difference(current_nodes)
 		c = len(new_nodes)
-		self._track_new_nodes.append(current)
+		self._track_selected_node.append(current)
+		self._track_rank_selected.append(rank)
 
 	def _bandit(self):
 		# Initialize graph with Random Walk
-		close_n = self._init_bandit_g_rw()
+		close_n, cash_count = self._init_bandit_g_rw()
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 
@@ -1330,6 +1340,8 @@ class UndirectedSingleLayer(object):
 		sub_sample['nodes']['close'].update(close_n)
 		iter_count = 1
 
+		#cash_count = {}
+
 
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 			# Query on the selected node
@@ -1339,6 +1351,10 @@ class UndirectedSingleLayer(object):
 
 			# Update bandit
 			bandit = self._update_arms(bandit, current_node, current_arm, nodes, closed_nodes, iter_count)
+
+			for node in nodes:
+				cash_count[node] = cash_count.get(node, 1 ) + (cash_count.get(current_node,1) / len(nodes))
+
 
 			# For tracking
 			self._count_new_nodes(nodes, current_node)
@@ -1354,19 +1370,13 @@ class UndirectedSingleLayer(object):
 			self._increment_cost(c)
 
 			bandit = self._update_score(bandit, iter_count)
-			#tmp = self._get_arms_members_more_than(bandit)
-			#new_dict = {k: v for k, v in bandit['score'].items() if k in tmp}
-			#max_score = max(new_dict.values())
 			max_score = max(bandit['score'].values())
 
 			candidate_arms = _mylib.get_keys_by_value(bandit['score'], max_score)
 			current_arm = random.choice(candidate_arms)
 			members = bandit['arms'][current_arm]
-			current_node = self._pick_next_node(members)#random.choice(members)
-
-
-
-			#print('Max score: {}, Candidates: {}'.format(max_score, len(candidate_arms)))
+			#current_node = self._pick_next_node(members)#random.choice(members)
+			current_node = self._pick_next_node_from_cash(members, cash_count)
 
 			iter_count += 1
 
@@ -1374,15 +1384,18 @@ class UndirectedSingleLayer(object):
 
 	def _pick_next_node(self, candidates):
 		return random.choice(candidates)
-		# pr = nx.pagerank(self._sample_graph, alpha=0.9)
-		#
-		# new_dict = {k: v for k, v in pr.items() if k in candidates}
-		#
-		# sorted_d = _mylib.sortDictByValues(new_dict,reverse=True)[0]
-		#
-		# #print(sorted_d, sorted_d[0])
-		#
-		# return sorted_d[0]
+
+	def _pick_next_node_from_cash(self, candidates, cash_count):
+		cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
+
+		for index, ccc in enumerate(cash_count_sorted):
+			#print(cash_count_sorted[index][0])
+			if cash_count_sorted[index][0] in candidates:
+				c = cash_count_sorted[index][0]
+				return c
+
+
+
 
 	def _pr_graph_tool(self):
 		gt_graph = networkx2gt.nx2gt(self._sample_graph)
@@ -1580,11 +1593,16 @@ class UndirectedSingleLayer(object):
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
 
+		cash_count = {}
+
 		while self._cost < START_BUDGET and len(sub_sample['nodes']['open']) > 0:
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
 			# For tracking
 			self._count_new_nodes(nodes, current_node)
+
+			for node in nodes:
+				cash_count[node] = cash_count.get(node, 1 ) + (cash_count.get(current_node,1) / len(nodes))
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1613,15 +1631,16 @@ class UndirectedSingleLayer(object):
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 		close_n = set(sub_sample['nodes']['close']) | set(self._sample['nodes']['close'])
-		return close_n
+		return close_n, cash_count
 
-
-	def _max_obs_deg(self):
+	def _cash_spread(self):
 		current_node = starting_node
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
 		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		cash_count = {}
 
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 
@@ -1630,6 +1649,54 @@ class UndirectedSingleLayer(object):
 			# Query the neighbors of current
 			nodes, edges, c = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node)
+
+			for c_n in nodes:
+				cash_count[c_n] = cash_count.get(c_n, 1) + (1 / len(nodes))
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+			# Update the cost
+
+			self._increment_cost(c)
+
+
+			candidates = list(
+				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
+					self._sample['nodes']['close']))
+
+			#degree_observed = self._sample_graph.degree(candidates)
+			cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
+
+
+			for index,ccc in enumerate(cash_count_sorted):
+				if cash_count_sorted[index][0] in candidates:
+					current_node = cash_count_sorted[index][0]
+					break
+
+
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
+	def _max_obs_deg(self):
+		current_node = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		rank = 0
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+
+			close_n = sub_sample['nodes']['close']
+
+			# Query the neighbors of current
+			nodes, edges, c = self._query.neighbors(current_node)
+			self._count_new_nodes(nodes, current_node, rank)
 
 
 			# Update the sub sample
@@ -1649,7 +1716,7 @@ class UndirectedSingleLayer(object):
 			degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
 			current_node = degree_observed_sorted[0][0]
 
-
+			rank = self._get_node_rank_from_excess_degree(current_node, candidates)
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -1714,17 +1781,6 @@ class UndirectedSingleLayer(object):
 			new_cand = candidates
 
 		return random.choice(list(new_cand))
-
-		# open_nb = set()
-		# while len(open_nb) == 0:
-		# 	print('		Deg size', len(deg), len(open_nb))
-		# 	node = _mylib.pickMaxValueFromDict(deg)
-		# 	nbs = self._sample_graph.neighbors(node)
-		# 	open_nb = set(nbs).intersection(candidates)
-		# 	deg = _mylib.removekey(deg, node)
-
-		#return random.choice(list(open_nb))
-
 
 	def _cal_score(self, candidates):
 		open_nodes = candidates
@@ -2075,6 +2131,131 @@ class UndirectedSingleLayer(object):
 			self._line_1.append(nodes_count)
 			self._line_2.append(edges_count)
 
+	def _max_excess_deg(self):
+		current_node = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+
+			close_n = sub_sample['nodes']['close']
+
+			# Query the neighbors of current
+			nodes, edges, c = self._query.neighbors(current_node)
+			self._count_new_nodes(nodes, current_node)
+
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+			# Update the cost
+
+			self._increment_cost(c)
+
+			candidates = set(sub_sample['nodes']['open'])
+
+			degree_excess = self._get_node_excess_degree(candidates)
+
+			degree_excess_sorted = _mylib.sortDictByValues(degree_excess, reverse=True)
+			current_node = degree_excess_sorted[0][0]
+
+			rank = self._get_node_rank_from_excess_degree(current_node, candidates)
+
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
+
+	def _k_rank(self):
+		current_node = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current_node)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		rank=0
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+
+			close_n = sub_sample['nodes']['close']
+
+			# Query the neighbors of current
+			nodes, edges, c = self._query.neighbors(current_node)
+			self._count_new_nodes(nodes, current_node, rank)
+
+
+			# Update the sub sample
+			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			# Add edges to sub_graph
+			for e in edges:
+				self._sample_graph.add_edge(e[0], e[1])
+			# Update the cost
+
+			self._increment_cost(c)
+
+			candidates = set(sub_sample['nodes']['open'])
+
+			degree_true = self._query._graph.degree(candidates)
+			degree_observed = self._sample_graph.degree(candidates)
+
+			degree_excess = Counter(degree_true)
+			degree_excess.subtract(Counter(degree_observed))
+
+			degree_excess_sorted = _mylib.sortDictByValues(degree_excess, reverse=True)
+
+			cutoff = int(len(degree_excess_sorted) * 0.1)
+			if cutoff > 2:
+				current_node = random.choice(degree_excess_sorted[:cutoff])[0]
+			else:
+				current_node = degree_excess_sorted[0][0]
+
+			rank = self._get_node_rank_from_excess_degree(current_node, candidates)
+
+
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
+	def _get_node_excess_degree(self, candidates):
+		degree_true = self._query._graph.degree(candidates)
+		degree_observed = self._sample_graph.degree(candidates)
+
+		degree_excess = Counter(degree_true)
+		degree_excess.subtract(Counter(degree_observed))
+
+		return degree_excess
+
+	def _get_node_rank_from_excess_degree(self, selected_node, candidates):
+		degree_excess = self._get_node_excess_degree(candidates)
+		degree_excess_val = np.array(degree_excess.values())
+		degree_excess_val[::-1].sort()
+
+		selected_ex_deg = degree_excess[selected_node]
+
+		ranks = np.where(degree_excess_val == selected_ex_deg)[0]
+		avg_rank = np.mean(ranks)
+
+		min = degree_excess_val.min()
+		max = degree_excess_val.max()
+		mean = np.mean(degree_excess_val)
+
+
+		print('Min {}, Max {}, Avg. {}'.format(min, max, mean))
+
+		return avg_rank / len(candidates)
+
+
+
+
+
+
+
+
 	def generate(self):
 			"""
 			The main method that calls all the other methods
@@ -2116,6 +2297,8 @@ class UndirectedSingleLayer(object):
 					self._random_walk()
 				elif self._exp_type == 'mod':
 					self._max_obs_deg()
+				elif self._exp_type == 'med':
+					self._max_excess_deg()
 				elif self._exp_type == 'max-score':
 					self._max_score()
 				elif self._exp_type == 'oracle':
@@ -2128,10 +2311,15 @@ class UndirectedSingleLayer(object):
 					self._hybrid()
 				elif self._exp_type == 'vmab':
 					self._bandit()
+				elif self._exp_type == 'cash':
+					self._cash_spread()
+				elif self._exp_type == 'k-rank':
+					self._k_rank()
+
 
 				self._densi_count += 1
 
-				print('			Budget spent: {}/{}'.format(self._cost, self._budget))
+				#print('			Budget spent: {}/{}'.format(self._cost, self._budget))
 
 			print('			Number of nodes \t Close: {} \t Open: {}'.format( \
 				len(self._sample['nodes']['close']), \
@@ -2161,12 +2349,11 @@ def Logging(sample):
 	#print('	Clustering Coeff =', nx.average_clustering(graph))
 	print('-'*15)
 
-def SaveToFile(results_nodes,results_edges, query_order, results_hyb):
+def SaveToFile(results_nodes,results_edges, query_order, rank_order):
 	log.save_to_file(log_file_node, results_nodes)
-	log.save_to_file(log_file_edge, results_edges)
-	log.save_to_file(log_file_order, query_order)
-	if len(results_hyb) != 0:
-		log.save_to_file(log_file_hyb, results_hyb)
+	#log.save_to_file(log_file_edge, results_edges)
+	#log.save_to_file(log_file_order, query_order)
+	log.save_to_file(log_file_rank, rank_order)
 
 
 def Append_Log(sample, type):
@@ -2176,17 +2363,22 @@ def Append_Log(sample, type):
 	obs_track = [x[1] for x in track_sort]
 	obs_edges_track = [x[1] for x in track_edges_sort]
 
-	if type not in Log_result:
-		Log_result[type] = obs_track
-		Log_result_edges[type] = obs_edges_track
-	else:
-		Log_result[type] += (obs_track)
-		Log_result_edges[type] += (obs_edges_track)
+	# if type not in Log_result:
+	# 	Log_result[type] = obs_track
+	# 	Log_result_edges[type] = obs_edges_track
+	# else:
+	# 	Log_result[type] += (obs_track)
+	# 	Log_result_edges[type] += (obs_edges_track)
 
-	if type not in Log_result_nn:
-		Log_result_nn[type] = sample._track_new_nodes
-	else:
-		Log_result_nn[type] += sample._track_new_nodes
+	# if type not in Log_result_step_sel_node:
+	# 	Log_result_step_sel_node[type] = sample._track_selected_node
+	# else:
+	# 	Log_result_step_sel_node[type] += sample._track_selected_node
+
+	Log_result[type] = Log_result.get(type, list()) + obs_track
+	Log_result_edges[type] = Log_result_edges.get(type, list()) + obs_edges_track
+	Log_result_step_sel_node[type] = Log_result_step_sel_node.get(type, list()) + sample._track_selected_node
+	Log_result_step_sel_rank[type] = Log_result_step_sel_rank.get(type, list()) + sample._track_rank_selected
 
 	return cost_track
 
@@ -2201,9 +2393,6 @@ def Append_Log_Hybrid(sample, trial):
 	Log_result_hyb['trial'] = Log_result_hyb.get('trial', []) + trial_l
 	Log_result_hyb['window'] = Log_result_hyb.get('window', []) + windows
 	Log_result_hyb['threshold'] = Log_result_hyb.get('threshold', []) + sample._track_hyb_samp_threshold
-
-
-
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -2238,7 +2427,8 @@ if __name__ == '__main__':
 
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
-		exp_list = ['mod','rw', 'vmab']
+		exp_list = ['med','mod','rw','k-rank']
+		#exp_list = ['k-rank','mod','rw']
 	elif mode == 2:
 		exp_list = ['vmab']
 
@@ -2246,7 +2436,8 @@ if __name__ == '__main__':
 	print(exp_list)
 	Log_result = {}
 	Log_result_edges = {}
-	Log_result_nn = {}
+	Log_result_step_sel_node = {}
+	Log_result_step_sel_rank = {}
 
 	Log_result_hyb = {}
 
@@ -2262,13 +2453,13 @@ if __name__ == '__main__':
 		print('LCC: # nodes', graph.number_of_nodes())
 		query = query.UndirectedSingleLayer(graph)
 		#oracle = oracle.Oracle(graph, dataset)
+
 		log_file_node = log_file + dataset + '_n.txt'
 		log_file_edge = log_file + dataset + '_e.txt'
 		log_file_order = log_file + dataset + '_order.txt'
-		log_file_hyb = log_file + dataset + '_hyb.txt'
+		log_file_rank = log_file + dataset + '_rank.txt'
 
-		#log_file = log_file + dataset + '_edges.txt'
-		#log_file = log_file + dataset + '.txt'
+
 		n = graph.number_of_nodes()
 
 		if budget == 0:
@@ -2288,7 +2479,9 @@ if __name__ == '__main__':
 			# 							   log_interval)
 			sample = UndirectedSingleLayer(query, budget, bfs_budget, type, dataset, log, k, is_cost, log_interval)
 
-			if starting_node == -1: starting_node = sample._query.randomNode()
+			if starting_node == -1:
+				starting_node = sample._query.randomHighDegreeNode()
+				#starting_node = sample._query.randomNode()
 
 			print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
 
@@ -2301,18 +2494,24 @@ if __name__ == '__main__':
 			if type == 'hybrid':
 				Append_Log_Hybrid(sample, i)
 
-		if 'budget' not in Log_result:
-			Log_result['budget'] = cost_arr
-			Log_result_edges['budget'] = cost_arr
-		else:
-			Log_result['budget'] += (cost_arr)
-			Log_result_edges['budget'] += (cost_arr)
+		# if 'budget' not in Log_result:
+		# 	Log_result['budget'] = cost_arr
+		# 	Log_result_edges['budget'] = cost_arr
+		# else:
+		# 	Log_result['budget'] += (cost_arr)
+		# 	Log_result_edges['budget'] += (cost_arr)
+		#
+		# if 'budget' not in Log_result_step_sel_node:
+		# 	Log_result_step_sel_node['budget'] = range(1,len(sample._track_selected_node)+1)
+		# else:
+		# 	Log_result_step_sel_node['budget'] += range(1,len(sample._track_selected_node)+1)
 
-		if 'budget' not in Log_result_nn:
-			Log_result_nn['budget'] = range(1,len(sample._track_new_nodes)+1)
-		else:
-			Log_result_nn['budget'] += range(1,len(sample._track_new_nodes)+1)
+		Log_result['budget'] = Log_result.get('budget', list()) + cost_arr
+		Log_result_edges['budget'] = Log_result_edges.get('budget', list()) + cost_arr
+		Log_result_step_sel_node['budget'] = Log_result_step_sel_node.get('budget', list()) + range(1,len(sample._track_selected_node)+1)
+		Log_result_step_sel_rank['budget'] = Log_result_step_sel_rank.get('budget', list()) + range(1,len(sample._track_selected_node)+1)
+
 
 		starting_node = -1
 
-	SaveToFile(Log_result, Log_result_edges, Log_result_nn, Log_result_hyb)
+	SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)
