@@ -2456,9 +2456,9 @@ def Logging(sample):
 
 def SaveToFile(results_nodes,results_edges, query_order, rank_order):
 	log.save_to_file(log_file_node, results_nodes)
-	#log.save_to_file(log_file_edge, results_edges)
-	#log.save_to_file(log_file_order, query_order)
-	log.save_to_file(log_file_rank, rank_order)
+	log.save_to_file(log_file_edge, results_edges)
+	log.save_to_file(log_file_order, query_order)
+	#log.save_to_file(log_file_rank, rank_order)
 
 
 def Append_Log(sample, type):

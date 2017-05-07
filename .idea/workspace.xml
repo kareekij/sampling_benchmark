@@ -80,8 +80,8 @@
           <file leaf-file-name="sample.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sample.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="487">
-                  <caret line="1407" column="0" lean-forward="false" selection-start-line="1407" selection-start-column="0" selection-end-line="1407" selection-end-column="0" />
+                <state relative-caret-position="-11228">
+                  <caret line="1362" column="41" lean-forward="true" selection-start-line="1362" selection-start-column="41" selection-end-line="1362" selection-end-column="41" />
                   <folding>
                     <element signature="e#68#115#0" expanded="true" />
                     <element signature="e#34471#35219#0" expanded="false" />
@@ -127,7 +127,7 @@
             <entry file="file://$PROJECT_DIR$/sample.py">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="307">
-                  <caret line="1466" column="0" lean-forward="true" selection-start-line="1466" selection-start-column="0" selection-end-line="1466" selection-end-column="0" />
+                  <caret line="1466" column="0" lean-forward="false" selection-start-line="1466" selection-start-column="0" selection-end-line="1466" selection-end-column="0" />
                   <folding>
                     <element signature="e#68#115#0" expanded="true" />
                     <element signature="e#34471#35219#0" expanded="false" />
@@ -164,8 +164,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>cash</find>
-      <find>dict</find>
       <find>_init_bandit_g_rw</find>
       <find>bfs</find>
       <find>_random_walk</find>
@@ -194,6 +192,8 @@
       <find>vmab</find>
       <find>_update_arms</find>
       <find>_update_score</find>
+      <find>Log_result_step_sel_node</find>
+      <find>_track_selected_node</find>
     </findStrings>
     <replaceStrings>
       <replace>,</replace>
@@ -711,7 +711,14 @@
       <option name="project" value="LOCAL" />
       <updated>1494169101300</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="total 9 algorithms for comparison">
+      <created>1494194200002</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1494194200002</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -732,7 +739,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35032538" sideWeight="0.49676898" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27114967" sideWeight="0.42917997" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19466403" sideWeight="0.5532481" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19466403" sideWeight="0.5532481" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.45899895" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12939297" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19466403" sideWeight="0.44675186" order="10" side_tool="true" content_ui="tabs" />
@@ -814,7 +821,8 @@
     <MESSAGE value="Add local com, gen-edge step com obs." />
     <MESSAGE value="volatile-MAB, SEC by common neighbors" />
     <MESSAGE value="add OPIC, MEUD, top-k MEUD, observed rank step" />
-    <option name="LAST_COMMIT_MESSAGE" value="add OPIC, MEUD, top-k MEUD, observed rank step" />
+    <MESSAGE value="total 9 algorithms for comparison" />
+    <option name="LAST_COMMIT_MESSAGE" value="total 9 algorithms for comparison" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1065,14 +1073,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sample.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="307">
-          <caret line="1466" column="0" lean-forward="true" selection-start-line="1466" selection-start-column="0" selection-end-line="1466" selection-end-column="0" />
+        <state relative-caret-position="-11228">
+          <caret line="1362" column="41" lean-forward="true" selection-start-line="1362" selection-start-column="41" selection-end-line="1362" selection-end-column="41" />
           <folding>
             <element signature="e#68#115#0" expanded="true" />
             <element signature="e#34471#35219#0" expanded="false" />
             <element signature="e#36052#37149#0" expanded="false" />
             <element signature="e#37185#38379#0" expanded="false" />
             <element signature="e#44277#44438#0" expanded="false" />
+            <element signature="e#53445#55108#0" expanded="false" />
+            <element signature="e#55138#56363#0" expanded="false" />
             <element signature="e#56390#57510#0" expanded="false" />
             <element signature="e#57555#58128#0" expanded="false" />
             <element signature="e#58167#59066#0" expanded="false" />
