@@ -1229,6 +1229,8 @@ class UndirectedSingleLayer(object):
 
 			# Get the neighbors - nodes and edges; and cost associated
 			nodes, edges, c = self._query.neighbors(current)
+			nbs_list = list(nodes)
+
 			self._increment_cost(c)
 
 			self._count_new_nodes(nodes, current)
@@ -1248,7 +1250,7 @@ class UndirectedSingleLayer(object):
 			queue = list(set(queue))
 
 			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current)
+			sub_sample = self._updateSubSample(sub_sample, nbs_list, edges, current)
 
 		# Updat the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -2572,6 +2574,7 @@ if __name__ == '__main__':
 	if dataset == None:
 		f = fname.split('.')[1].split('/')[-1]
 		dataset = f
+		print(' *** dataset', dataset)
 
 	if args.task == 'undirected_single':
 		G = _mylib.read_file(fname)
