@@ -2549,7 +2549,7 @@ if __name__ == '__main__':
 	log_interval = args.log_interval
 	mode = args.mode
 	delimeter = args.delimiter
-	P_BUDGET =
+	P_BUDGET = args.percent_b
 
 
 	if mode == 1:
