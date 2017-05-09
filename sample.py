@@ -1250,7 +1250,7 @@ class UndirectedSingleLayer(object):
 			queue = list(set(queue))
 
 			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nbs_list, edges, current)
+			sub_sample = self._updateSubSample(sub_sample, set(nbs_list), edges, current)
 
 		# Updat the sample with the sub sample
 		self._updateSample(sub_sample)
