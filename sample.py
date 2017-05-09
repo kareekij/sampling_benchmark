@@ -1675,7 +1675,8 @@ class UndirectedSingleLayer(object):
 		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
 
 		cash_count = {}
-
+		max_cash = 0
+		max_cash_node = current_node
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 
 			close_n = sub_sample['nodes']['close']
@@ -1684,10 +1685,6 @@ class UndirectedSingleLayer(object):
 			nodes, edges, c = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node)
 
-			# For each neighbors, distribute current cash equally
-			# Any node starts with cash = 1
-			for c_n in nodes:
-				cash_count[c_n] = cash_count.get(c_n, 1) + (cash_count.get(current_node, 1) / len(nodes))
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1704,12 +1701,37 @@ class UndirectedSingleLayer(object):
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
 					self._sample['nodes']['close']))
 
-			cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
+			# For each neighbors, distribute current cash equally
+			# Any node starts with cash = 1
+			for c_n in nodes:
+				cash_count[c_n] = cash_count.get(c_n, 1) + (cash_count.get(current_node, 1) / len(nodes))
 
-			for index,ccc in enumerate(cash_count_sorted):
-				if cash_count_sorted[index][0] in candidates:
-					current_node = cash_count_sorted[index][0]
-					break
+				if c_n in candidates:
+					if cash_count[c_n] > max_cash:
+						max_cash_node = c_n
+
+			current_node = max_cash_node
+
+			# cash_keys = np.array(cash_count.keys())
+			# cash_vals = np.array(cash_count.values())
+			#
+			# # Get index of all candidate nodes
+			# ix = np.in1d(cash_keys.ravel(), candidates).reshape(cash_keys.shape)
+			# max_val = np.amax(cash_vals[np.where(ix)])
+			# max_val_index = np.where(cash_vals == max_val)
+			#
+			# current_node = random.choice(list(cash_keys[max_val_index]))
+			#
+			# while current_node not in candidates:
+			# 	current_node = random.choice(list(cash_keys[max_val_index]))
+			# 	print(' Re-pick .')
+
+		# cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
+			#
+			# for index,ccc in enumerate(cash_count_sorted):
+			# 	if cash_count_sorted[index][0] in candidates:
+			# 		current_node = cash_count_sorted[index][0]
+			# 		break
 
 
 
