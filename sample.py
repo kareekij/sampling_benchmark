@@ -1697,9 +1697,7 @@ class UndirectedSingleLayer(object):
 			self._increment_cost(c)
 
 
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
-					self._sample['nodes']['close']))
+			candidates = sub_sample['nodes']['open']
 
 			# For each neighbors, distribute current cash equally
 			# Any node starts with cash = 1
@@ -2526,6 +2524,7 @@ if __name__ == '__main__':
 	parser.add_argument('-task', help='Type of sampling', default='undirected_single')
 	parser.add_argument('fname', help='Edgelist file', type=str)
 	parser.add_argument('-budget', help='Total budget', type=int, default=0)
+	parser.add_argument('-percent_b', help='percent budget', type=float, default=0.05)
 	parser.add_argument('-bfs_budget', help='Bfs budget', type=int, default=5)
 	parser.add_argument('-dataset', help='Name of the dataset', default=None)
 	parser.add_argument('-log', help='Log file', default='./log/')
@@ -2550,15 +2549,16 @@ if __name__ == '__main__':
 	log_interval = args.log_interval
 	mode = args.mode
 	delimeter = args.delimiter
+	P_BUDGET =
 
 
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
 		#exp_list = ['med','mod','rw','k-rank']
 		#exp_list = ['pr','mod','rw']
-		exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab', 'pr']
+		exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab']
 	elif mode == 2:
-		exp_list = ['vmab']
+		exp_list = ['mod', 'rand', 'rw', 'bfs', 'sb', 'dfs', 'opic', 'vmab', 'pr']
 
 
 	print(exp_list)
@@ -2591,7 +2591,8 @@ if __name__ == '__main__':
 		n = graph.number_of_nodes()
 
 		if budget == 0:
-			budget = int(.10*n)
+			budget = int(P_BUDGET*n)
+			print(' Budget', budget)
 		print('{} Budget set to {} , n={}'.format(dataset, budget, n))
 
 	print(graph.number_of_nodes())
