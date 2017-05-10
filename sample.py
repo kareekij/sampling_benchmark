@@ -1699,32 +1699,40 @@ class UndirectedSingleLayer(object):
 			self._increment_cost(c)
 
 
-			candidates = sub_sample['nodes']['open']
-
+			candidates = list(sub_sample['nodes']['open'])
+			# candidate_nbs = set(nodes).intersection(set(candidates))
+			#
 			# For each neighbors, distribute current cash equally
 			# Any node starts with cash = 1
 			for c_n in nodes:
 				cash_count[c_n] = cash_count.get(c_n, 1) + (cash_count.get(current_node, 1) / len(nodes))
 
-				if c_n in candidates:
-					if cash_count[c_n] > max_cash:
-						max_cash_node = c_n
+			# 	if cash_count[c_n] > max_cash:
+			# 		max_cash_node = c_n
+			# 		max_cash = cash_count[c_n]
+			#
+			# current_node = max_cash_node
 
-			current_node = max_cash_node
 
-			# cash_keys = np.array(cash_count.keys())
-			# cash_vals = np.array(cash_count.values())
-			#
-			# # Get index of all candidate nodes
-			# ix = np.in1d(cash_keys.ravel(), candidates).reshape(cash_keys.shape)
-			# max_val = np.amax(cash_vals[np.where(ix)])
-			# max_val_index = np.where(cash_vals == max_val)
-			#
-			# current_node = random.choice(list(cash_keys[max_val_index]))
-			#
-			# while current_node not in candidates:
-			# 	current_node = random.choice(list(cash_keys[max_val_index]))
-			# 	print(' Re-pick .')
+
+
+			cash_keys = np.array(cash_count.keys())
+			cash_vals = np.array(cash_count.values())
+
+
+
+			# Get index of all candidate nodes
+			ix = np.in1d(cash_keys.ravel(), candidates).reshape(cash_keys.shape)
+
+			max_val = np.amax(cash_vals[np.where(ix)])
+
+			max_val_index = np.where(cash_vals == max_val)
+
+			current_node = random.choice(list(cash_keys[max_val_index]))
+
+			while current_node not in candidates:
+				current_node = random.choice(list(cash_keys[max_val_index]))
+				print(' Re-pick .')
 
 		# cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
 			#
