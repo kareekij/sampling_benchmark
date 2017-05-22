@@ -514,3 +514,22 @@ def get_keys_by_value(d, target_val=0):
 
     indices = np.where(vals == target_val)[0]
     return keys[indices].tolist()
+
+def get_max_values_from_dict(d, candidates):
+    keys = np.array(d.keys())
+    vals = np.array(d.values())
+
+    # Index of all candidates
+    ix = np.in1d(keys.ravel(), candidates).reshape(keys.shape)
+
+    # Get all the values of candidates and find the max
+    max_val = np.amax(vals[np.where(ix)])
+
+    # Get all indices of max value
+    max_val_index = np.where(vals == max_val)
+
+    #print(type(ix), type(max_val_index))
+
+    return random.choice(list(keys[max_val_index])), max_val_index
+
+

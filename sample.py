@@ -18,7 +18,7 @@ import argparse
 import oracle
 import query
 import log
-
+import time
 
 import community
 import _mylib
@@ -27,6 +27,8 @@ from scipy import stats
 
 from sklearn import linear_model
 from collections import defaultdict, Counter
+
+
 
 starting_node = -1
 
@@ -1704,7 +1706,8 @@ class UndirectedSingleLayer(object):
 			#
 			# For each neighbors, distribute current cash equally
 			# Any node starts with cash = 1
-			for c_n in nodes:
+			nodes_update = set(nodes).intersection(set(candidates))
+			for c_n in list(nodes_update):
 				cash_count[c_n] = cash_count.get(c_n, 1) + (cash_count.get(current_node, 1) / len(nodes))
 
 			# 	if cash_count[c_n] > max_cash:
@@ -1713,26 +1716,24 @@ class UndirectedSingleLayer(object):
 			#
 			# current_node = max_cash_node
 
-
-
-
 			cash_keys = np.array(cash_count.keys())
 			cash_vals = np.array(cash_count.values())
 
 
 
 			# Get index of all candidate nodes
-			ix = np.in1d(cash_keys.ravel(), candidates).reshape(cash_keys.shape)
+			# ix = np.in1d(cash_keys.ravel(), candidates).reshape(cash_keys.shape)
+			# max_val = np.amax(cash_vals[np.where(ix)])
+			# max_val_index = np.where(cash_vals == max_val)
+			# current_node = random.choice(list(cash_keys[max_val_index]))
+			current_node, indices = _mylib.get_max_values_from_dict(cash_count, candidates)
 
-			max_val = np.amax(cash_vals[np.where(ix)])
-
-			max_val_index = np.where(cash_vals == max_val)
-
-			current_node = random.choice(list(cash_keys[max_val_index]))
 
 			while current_node not in candidates:
-				current_node = random.choice(list(cash_keys[max_val_index]))
+				current_node = random.choice(list(cash_keys[indices]))
 				print(' Re-pick .')
+
+			#print('pick ', current_node)
 
 		# cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
 			#
@@ -1779,34 +1780,11 @@ class UndirectedSingleLayer(object):
 
 			pr = nx.pagerank(self._sample_graph)
 
-			pr_keys = np.array(pr.keys())
-			pr_vals = np.array(pr.values())
+			current_node, indices = _mylib.get_max_values_from_dict(pr, candidates)
 
-			# Get index of all candidate nodes
-			ix = np.in1d(pr_keys.ravel(), candidates).reshape(pr_keys.shape)
-			#print(ix)
-			#print(np.where(ix))
-
-
-			max_val = np.amax(pr_vals[np.where(ix)])
-
-			max_val_index = np.where(pr_vals == max_val)
-
-
-
-			current_node = random.choice(list(pr_keys[max_val_index]))
-			#print('		Test', max_val, pr[current_node])
 			while current_node not in candidates:
-				current_node = random.choice(list(pr_keys[max_val_index]))
+				current_node = random.choice(list(pr_keys[indices]))
 				print(	' Re-pick .')
-
-
-
-
-			#pr_sorted = _mylib.sortDictByValues(pr, reverse=True)
-
-			#current_node = degree_observed_sorted[0][0]
-
 
 
 		# Update the sample with the sub sample
@@ -1844,8 +1822,10 @@ class UndirectedSingleLayer(object):
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 
 			degree_observed = self._sample_graph.degree(candidates)
-			degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-			current_node = degree_observed_sorted[0][0]
+			#degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
+			#current_node = degree_observed_sorted[0][0]
+			current_node, indices = _mylib.get_max_values_from_dict(degree_observed, candidates)
+
 
 			#rank = self._get_node_rank_from_excess_degree(current_node, candidates)
 
@@ -2565,8 +2545,8 @@ if __name__ == '__main__':
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
 		#exp_list = ['med','mod','rw','k-rank']
-		#exp_list = ['pr','mod','rw']
-		exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab']
+		exp_list = ['mod']
+		#exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab']
 	elif mode == 2:
 		exp_list = ['mod', 'rand', 'rw', 'bfs', 'sb', 'dfs', 'opic', 'vmab', 'pr']
 
@@ -2605,6 +2585,7 @@ if __name__ == '__main__':
 			budget = int(P_BUDGET*n)
 			print(' Budget', budget)
 		print('{} Budget set to {} , n={}'.format(dataset, budget, n))
+
 
 	print(graph.number_of_nodes())
 	print(graph.number_of_edges())
@@ -2651,4 +2632,4 @@ if __name__ == '__main__':
 
 		starting_node = -1
 
-	SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)
+	#SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)
