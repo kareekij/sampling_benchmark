@@ -2545,10 +2545,13 @@ if __name__ == '__main__':
 	if mode == 1:
 		#exp_list = ['mod','rw','random','sb','bfs']
 		#exp_list = ['med','mod','rw','k-rank']
-		exp_list = ['mod']
-		#exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab']
+		#exp_list = ['mod']
+		exp_list = ['mod','rand','rw','bfs','sb','dfs','opic', 'vmab']
 	elif mode == 2:
 		exp_list = ['mod', 'rand', 'rw', 'bfs', 'sb', 'dfs', 'opic', 'vmab', 'pr']
+	elif mode == 3:
+		exp_list = ['opic', 'vmab', 'pr']
+
 
 
 	print(exp_list)
