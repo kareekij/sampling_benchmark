@@ -2632,4 +2632,4 @@ if __name__ == '__main__':
 
 		starting_node = -1
 
-	#SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)
+	SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)
