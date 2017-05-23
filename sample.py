@@ -1779,6 +1779,7 @@ class UndirectedSingleLayer(object):
 
 
 			pr = nx.pagerank(self._sample_graph)
+			pr_keys = pr.keys()
 
 			current_node, indices = _mylib.get_max_values_from_dict(pr, candidates)
 
