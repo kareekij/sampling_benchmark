@@ -7,6 +7,9 @@ Simulate the API queries
 import networkx as nx
 import random
 import _mylib
+import pickle
+import community
+import os
 
 class UndirectedSingleLayer(object):
 	"""
@@ -58,12 +61,28 @@ class UndirectedSingleLayer(object):
 		for n in deg_one_nodes:
 			print(cc[n])
 
+	def randomFromLargeCommunity(self, G, dataset):
+		com_fname = './data/pickle/communities_{}.pickle'.format(dataset)
+		if os.path.isfile(com_fname):
+			partition = pickle.load(open(com_fname, 'rb'))
+		else:
+			partition = community.best_partition(G)
+			pickle.dump(partition, open(com_fname, 'wb'))
 
-		# deg_nb = 0
-		# while deg_nb !=2:
-		# 	selected_node = random.choice(deg_one_nodes)
-		# 	nb = self._graph.neighbors(selected_node)
-        #
-		# 	deg_nb = degree[nb[0]]
-		# 	print(selected_node, degree[selected_node], nb[0], deg_nb)
-		# return selected_node
+		count_members = {}
+		for p in set(partition.values()):
+			members = _mylib.get_members_from_com(p, partition)
+			count_members[p] = len(members)
+
+		selected_p, i = _mylib.get_max_values_from_dict(count_members, count_members.keys())
+		members = _mylib.get_members_from_com(selected_p, partition)
+
+		degree = self._graph.degree(members)
+		degree_sorted = _mylib.sortDictByValues(degree, reverse=True)
+		size = int(.1 * len(degree))
+		degree_sorted = degree_sorted[:size]
+		return random.choice(degree_sorted)[0]
+
+
+
+

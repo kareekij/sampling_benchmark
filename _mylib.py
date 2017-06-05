@@ -59,7 +59,7 @@ def plotLineGraph(lines,legend=None,title=None,x_axis_text=None, y_axis_text=Non
         if log:
             plt.semilogy(line)
         else:
-            plt.plot(line)
+            plt.plot(line, marker='x',linestyle='')
 
     if legend != None:
         plt.legend(legend, loc='upper left')
@@ -351,7 +351,7 @@ def degreeHist(deg,log_log=True, save=True):
 
     plt.figure()
     plt.grid(True)
-    if log_log: plt.loglog(values, hist ,'r', marker='x')
+    if log_log: plt.loglog(values, hist ,'r', marker='o', markersize=3)
     else: plt.plot(values, hist, 'r-')
 
     # plt.legend(['In-degree','Out-degree']#)
@@ -395,6 +395,28 @@ def degreeHist_2(deg_l,log_log=True, save=True, legend=['In-degree','Out-degree'
         plt.savefig('./draw/plot/deg_2_' + str(time.time()) + '.png')
 
     plt.clf()
+
+def distributionPlot(deg,log_log=True, save=True, y_label="Freq", x_label="value", title=""):
+    values = (sorted(deg))
+    hist = [deg.count(x) for x in (values)]
+
+    plt.figure()
+    plt.grid(True)
+    if log_log: plt.loglog(values, hist ,'r', marker='o', markersize=2)
+    else: plt.scatter(values, hist, s=2)
+
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title('distribution '+ title)
+
+    if not save:
+        plt.show()
+    else:
+        plt.savefig('./draw/plot/distribution' + str(time.time()) + '.png')
+
+    plt.clf()
+
 
 def calculate_density(g):
     n = g.number_of_nodes()
@@ -514,3 +536,24 @@ def get_keys_by_value(d, target_val=0):
 
     indices = np.where(vals == target_val)[0]
     return keys[indices].tolist()
+
+def get_max_values_from_dict(d, candidates=list()):
+    if len(candidates) == 0:
+        candidates = list(d.keys())
+
+
+    keys = np.array(d.keys())
+    vals = np.array(d.values())
+
+    # Index of all candidates
+    ix = np.in1d(keys.ravel(), candidates).reshape(keys.shape)
+
+    # Get all the values of candidates and find the max
+    max_val = np.amax(vals[np.where(ix)])
+
+    # Get all indices of max value
+    max_val_index = np.where(vals == max_val)
+
+    #print(type(ix), type(max_val_index))
+
+    return random.choice(list(keys[max_val_index])), max_val_index
