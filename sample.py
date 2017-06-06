@@ -1777,12 +1777,13 @@ class UndirectedSingleLayer(object):
 			candidates = list(
 				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 
-
+			print('		- calculating pr ', self._cost, self._sample_graph.number_of_nodes())
 			pr = nx.pagerank(self._sample_graph)
-			pr_keys = pr.keys()
+			pr_keys = np.array(pr.keys())
 
+			print('		- get max pr')
 			current_node, indices = _mylib.get_max_values_from_dict(pr, candidates)
-
+			print('		- done pr')
 			while current_node not in candidates:
 				current_node = random.choice(list(pr_keys[indices]))
 				print(	' Re-pick .')
@@ -2551,7 +2552,7 @@ if __name__ == '__main__':
 	elif mode == 2:
 		exp_list = ['mod', 'rand', 'rw', 'bfs', 'sb', 'dfs', 'opic', 'vmab', 'pr']
 	elif mode == 3:
-		exp_list = ['opic', 'vmab', 'pr']
+		exp_list = ['pr']
 
 
 
