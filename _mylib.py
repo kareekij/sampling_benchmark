@@ -11,7 +11,7 @@ import collections
 import networkx2gt
 from graph_tool.all import *
 import random
-
+import pickle
 
 def logToFileCSV(data,filename,isAppend=False):
     if isAppend: mode = 'a'
@@ -376,8 +376,8 @@ def degreeHist_2(deg_l,log_log=True, save=True, legend=['In-degree','Out-degree'
     plt.figure()
     plt.grid(True)
     if log_log:
-        plt.loglog(values_1, hist_1, 'r')
-        plt.loglog(values_2, hist_2, 'b')
+        plt.loglog(values_1, hist_1, 'r', marker='o', markersize=3)
+        plt.loglog(values_2, hist_2, 'b', marker='o', markersize=3)
     else:
         plt.plot(values_1, hist_1, 'r')
         plt.plot(values_2, hist_2, 'b')
@@ -518,14 +518,13 @@ def read_mtx_file(fname):
 def read_file(fname):
     ext = fname.split('.')[-1]
 
-    print(' Reading.. {} format'.format(ext))
+    print('     < Reading.. \'{}\' format, {} '.format(ext, fname))
     if ext == 'mtx' or ext == 'edges':
         edges_list = read_mtx_file(fname)
         G = nx.Graph()
         G.add_edges_from(edges_list)
-
-    # elif ext == 'edges':
-    #     G = nx.read_edgelist(fname, comments="%")
+    elif ext == 'pickle':
+        G = pickle.load(open(fname, 'rb'))
     else:
         G = nx.read_edgelist(fname)
     return G
