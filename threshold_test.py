@@ -30,7 +30,6 @@ from collections import defaultdict, Counter
 
 from scipy import stats
 
-
 import matplotlib as mpl
 mpl.use('agg')
 
@@ -63,17 +62,13 @@ class UndirectedSingleLayer(object):
 		self._cost = 0 					# Keep track of the cost spent
 		self._sample = {'edges': set(), 'nodes':\
 		 {'close':set(), 'open':set()}}
-
-		self._starting_wt = 0
-		self._wt_den = 3 #0.90 # 3 				# Weight of the densification score
-		self._wt_exp = 1 #(1 - self._wt_den)			# Weight of the expansion score
-
+		self._wt_exp = 1 				# Weight of the expansion score
+		self._wt_den = 3 				# Weight of the densification score
 		self._score_den_list = [] 			# List to store densification scores; used only for logging
 		self._score_exp_list = [] 			# List to store expansion scores; used only for logging
 		self._new_nodes = []			# List of the new nodes observed at each densification
-		self._ext_nodes = []
 		self._cumulative_new_nodes = [] # Cummulated new nodes
-		self._exp_cut_off = 15			# Numbor of expansion candidates
+		self._exp_cut_off = 50			# Numbor of expansion candidates
 		self._den_cut_off = 100 			# Number of densificaiton candidates
 		self._score_den_threshold = 0.1
 		self._sample_graph = nx.Graph() # The sample graph
@@ -82,8 +77,8 @@ class UndirectedSingleLayer(object):
 		self._med_deg = 0.
 		self._cost_spent = []
 		self._nodes_return = []
-		self._exp_count = 1
-		self._densi_count = 1
+		self._exp_count = 0
+		self._densi_count = 0
 		self._track_obs_nodes = []
 		self._track_cost = []
 		self._track = {}
@@ -120,19 +115,7 @@ class UndirectedSingleLayer(object):
 		self._data_to_plot = []
 		self._chose_deg = []
 
-		self._bandit = {'arms': dict.fromkeys([1,2,3,4]),
-				  'score': dict.fromkeys([1,2,3,4], float('inf')),
-				  'count': dict.fromkeys([1,2,3,4], 0),
-				  'created_at': dict.fromkeys([1,2,3,4], 0),
-				  'rewards': defaultdict(list)}
-
-		self._sel_obs_deg = dict()
-		self._sel_act_deg = dict()
-		self._deg_correlation = []
-		self._p_value = []
-
-		self._expected_avg_deg = 0
-		self._wt_increment = 1
+		self._T = 0.2
 
 	def _expansion_random(self, candidate_list):
 		degree_observed = self._sample_graph.degree(candidate_list)
@@ -948,13 +931,10 @@ class UndirectedSingleLayer(object):
 		# self._den_unobs = []
 
 		prev_score = score_den
-		#score_change = 1.
-		#score_list = []
-		#THRESHOLD = 1.
-		#isConverge = False
-
-		# starting_w_den = self._wt_den
-		# starting_w_exp = self._wt_exp
+		score_change = 1.
+		score_list = []
+		THRESHOLD = 1.
+		isConverge = False
 
 		# Perform densification until one of the conditions is met:
 		# 	1. Densification score is less than the expansion score
@@ -972,9 +952,8 @@ class UndirectedSingleLayer(object):
 			o_nodes = set(self._sample['nodes']['open']).union(set(sub_sample['nodes']['open']))
 			selected_arm = -1
 
-			if len(den_nodes) > 10:
-				#current, current_node_obs_deg = self._node_selection(den_nodes)
-				current, current_node_obs_deg  = self._node_selection(den_nodes)
+			if len(den_nodes) != 1:
+				current, current_node_obs_deg = self._node_selection(den_nodes)
 			else:
 				current = list(den_nodes)[0]
 				current_node_obs_deg = degree_observed[current]
@@ -986,37 +965,18 @@ class UndirectedSingleLayer(object):
 			# All neighbors that are not closed
 			not_close_nbs = set(nodes) - c_nodes
 
-			self._sel_obs_deg[current] = current_node_obs_deg
-			self._sel_act_deg[current] = len(nodes)
 
 			# TODO: Densification score, to be changed.
 			# Update the densification and expansion scores
 			deg_close = self._sample_graph.degree(list(c_nodes)).values()
-			avg_deg = np.median(np.array(deg_close))
+			avg_deg = np.average(np.array(deg_close))
 			sd_deg = np.std(np.array(deg_close))
 
-			#######
-			#if int(self._cost) % self._log_interval == 0 and self._cost >= 10:
-				# if len(self._sel_act_deg) > 10:
-				# 	k = int(len(self._sel_act_deg) / 2)
-				# else:
-			#k = int(.20 * len(self._sel_act_deg))
-			# if k == 0:
-			# 	k = len(self._sel_act_deg)
-			k = len(self._sel_act_deg)
-			tau, p_value = _mylib.get_rank_correlation(self._sel_act_deg, self._sel_obs_deg, k=k)
-			self._deg_correlation.append(tau)
-			self._p_value.append(p_value)
 
 			score_den = self._scoreDen_test(sub_sample, avg_deg, nodes,current_node_obs_deg,score_den)
-			score_exp = self._scoreExp(sub_sample, avg_deg, nodes, current_node_obs_deg, score_exp)
-
-			#score_exp = self._scoreExp(sub_sample, score_exp)
 
 			# Store the densification and expansion scores
 			self._score_den_list.append(score_den)
-			self._score_exp_list.append(score_exp)
-
 			self._densi_count += 1
 
 			# Update the sub sample
@@ -1031,29 +991,21 @@ class UndirectedSingleLayer(object):
 
 			# TODO: just a dummy statement for MOD method
 			#T = self._score_den_threshold * math.exp(-(0.05 * self._exp_count))
-			T = 0.
+			T = self._T
 			# c_nodes = set(sub_sample['nodes']['close'])
 			# deg = self._sample_graph.degree(list(c_nodes))
 			# mean_deg = np.average(np.array(deg.values()))
 			# sd_deg = np.std(np.array(deg.values()))
 			# T = mean_deg + sd_deg
 
-			nn_mean = np.mean(np.array(self._new_nodes))
-			print('{}:{} weight {} \t score_den: {}	\t score_exp: {} \t cost: {} \t exp:{} \t obs:{} act:{} | {}/{}'.format(self._densi_count, self._exp_count, self._wt_den, round(score_den,2),
-																																  round(score_exp,2), self._cost, round(self._expected_avg_deg, 0), current_node_obs_deg, len(nodes),
-																															  len(den_nodes), len(list(sub_sample['nodes']['open'])) ))
-			#score_exp = 0
-			#if score_den <= T:
-			if score_den < score_exp:
-				print(' \t \t Switch!')
+
+			print('T {} \t score_den: {}		cost: {} '.format(round(T,2), round(score_den,2), self._cost))
+
+			if score_den <= T:
 				break
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
-
-		# Reset weights
-		# starting_w_den = self._wt_den
-		# starting_w_exp = self._wt_exp
 
 		# Return list of potential expansion nodes
 		return self._getExpNodes()
@@ -1231,8 +1183,8 @@ class UndirectedSingleLayer(object):
 
 		# This should be for only the start of the densification
 		if nodes is None:
-			#return 1.
-			return np.inf
+			return 1.
+			#return np.inf
 
 		# The new nodes; Nodes neithen in sample and sub sample
 		# new_nodes = nodes.difference(sub_sample['nodes']['close']) \
@@ -1252,53 +1204,20 @@ class UndirectedSingleLayer(object):
 		# TODO: score function
 		# Calculate the densification score
 		try:
-			score = deg_new_nodes / deg_in
+			#score = deg_true - avg_deg
+			score = deg_new_nodes / deg_true #deg_in
+			#score = deg_true
 		except ZeroDivisionError:
 			score = 0.
 
 		# Store number of new nodes for logging later
 		self._new_nodes.append(deg_new_nodes)
-		self._ext_nodes.append(deg_existing_open)
-
-
-		#self._wt_den = self._exp_count + self._cost
-		#t = (2*math.log10(self._cost+1) / self._densi_count)
-		#t = ((self._cost + 1) / self._densi_count) * (1/avg_deg)
-
-
-		# if len(self._deg_correlation) > 1:
-		# 	tau_cur = round(self._deg_correlation[-1],4)
-		# 	tau_pre = round(self._deg_correlation[-2],4)
-		#
-		# 	if tau_cur - tau_pre > 0.01:
-		# 		self._wt_den = self._wt_den - 0.2
-		# 	else:
-		# 		self._wt_den = self._wt_den + 0.2
-
-
-		#if self._cost % 5 == 0:
-		#if (deg_obs - self._expected_avg_deg) > 10 or (deg_obs - self._expected_avg_deg) < -10:
-
-		bound = int(.20*self._expected_avg_deg)
-
-		if deg_obs > (self._expected_avg_deg-bound):
-		#if deg_obs > avg_true_deg:
-			self._wt_den = self._wt_den + self._wt_increment
-
-		# if lower_b < deg_obs and deg_obs < upper_b:
-		# 		self._wt_den = self._wt_den + 10
-		# else:
-		# 	self._wt_den = self._wt_den - 10
-		#
-		# 	if self._wt_den < self._starting_wt:
-		# 		self._wt_den = self._starting_wt
-
-
 
 		if np.isfinite(prev):
 			s = (0.5 * prev) + (self._wt_den * score)
 		else:
 			s = self._wt_den * score
+		#s = score
 
 		return s
 
@@ -1316,9 +1235,7 @@ class UndirectedSingleLayer(object):
 
 		# This should be for only the start of the densification
 		if nodes is None:
-			print(nodes)
-			return 1#self._sample_graph.number_of_nodes()
-			#return np.inf
+			return np.inf
 
 		# The new nodes; Nodes neithen in sample and sub sample
 		new_nodes = nodes.difference(sub_sample['nodes']['close'])\
@@ -1344,12 +1261,13 @@ class UndirectedSingleLayer(object):
 			c_new_nodes = self._cumulative_new_nodes[-1]
 			self._cumulative_new_nodes.append(c_new_nodes + len(new_nodes))
 
+
 		if np.isfinite(prev):
 			return 0.5 * prev + self._wt_den * score
 		else:
 			return self._wt_den * score
 
-	def _scoreExp(self, sub_sample, avg_deg=0, nodes=None, deg_obs=0, prev=0):
+	def _scoreExp(self, sub_sample, prev=0):
 		"""
 		Calculate the expansion score
 
@@ -1359,41 +1277,18 @@ class UndirectedSingleLayer(object):
 		"""
 
 		# Get the edges between open and close nodes in the current sub sample
-		# edges = set()
-		# for e in sub_sample['edges']:
-		# 	if (e[0] in sub_sample['nodes']['close']\
-		# 	 and e[1] in sub_sample['nodes']['open'])\
-		# 	 or (e[1] in sub_sample['nodes']['close']\
-		# 	 and e[0] in sub_sample['nodes']['open']):
-		# 		edges.add(e)
-		#
-		# # Calculate the expansion score
-		# score = len(edges)/(len(sub_sample['nodes']['open']) + 1)
-		if nodes is None:
-			return 0.
+		edges = set()
+		for e in sub_sample['edges']:
+			if (e[0] in sub_sample['nodes']['close']\
+			 and e[1] in sub_sample['nodes']['open'])\
+			 or (e[1] in sub_sample['nodes']['close']\
+			 and e[0] in sub_sample['nodes']['open']):
+				edges.add(e)
 
-		observed_nodes = self._sample_graph.nodes()
-		new_nodes = set(nodes) - set(observed_nodes)
-		deg_true = len(nodes)
-		deg_new_nodes = len(new_nodes)
-		deg_existing_open = len(nodes) - deg_new_nodes - deg_obs
-		deg_in = deg_existing_open + deg_new_nodes
+		# Calculate the expansion score
+		score = len(edges)/(len(sub_sample['nodes']['open']) + 1)
 
-		#self._wt_exp = (1. - self._wt_den)
-		# t = self._wt_exp / self._exp_count
-		t = self._wt_exp
-
-		# TODO: score function
-		# Calculate the densification score
-		try:
-			score = deg_existing_open / deg_in
-		except ZeroDivisionError:
-			score = 0.
-
-		#t = (2 * math.log10(self._cost+1) / self._exp_count)
-		#t = (self._cost+1) / self._exp_count
-
-		return 0.5 * prev + (t * score)
+		return 0.5 * prev + self._wt_exp * score
 
 	def _updateSample(self, sub_sample):
 		"""
@@ -1443,91 +1338,6 @@ class UndirectedSingleLayer(object):
 
 
 		return sub_sample
-
-	def _bfs_init(self):
-
-		"""
-		Collect the initial nodes through bfs
-
-		Args:
-			None
-		Return:
-			None
-		"""
-
-		sub_sample = {'edges':set(), 'nodes':{'close':set(), 'open':set()}}
-
-		current = starting_node
-
-		sub_sample['nodes']['open'].add(current)
-		queue = [current]
-
-		# Run till bfs budget allocated or no nodes left in queue
-		while self._cost < self._bfs_count and len(queue) > 0:
-			# Select the first node from queue
-			current = queue[0]
-
-			# Get the neighbors - nodes and edges; and cost associated
-			nodes, edges, c = self._query.neighbors(current)
-			self._count_new_nodes(nodes, current)
-
-			self._increment_cost(c)
-
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-
-			# Remove the current node from queue
-			queue.remove(current)
-
-			# Update queue
-			nodes = nodes.difference(sub_sample['nodes']['close'])
-			nodes = nodes.difference(sub_sample['nodes']['open'])
-			queue += list(nodes)
-			queue = list(set(queue))
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current)
-
-		# Updat the sample with the sub sample
-		self._updateSample(sub_sample)
-
-	def _after_bfs(self):
-		true_g = self._query._graph
-		act_deg = true_g.degree()
-		act_min_deg = min(act_deg.values())
-		act_max_deg = max(act_deg.values())
-		average_deg = np.average(np.array(act_deg.values()))
-
-		current_g = self._sample_graph
-		close_nodes = self._sample['nodes']['close']
-		open_nodes = self._sample['nodes']['open']
-
-		deg = current_g.degree(list(close_nodes))
-		min_deg = min(deg.values())
-		max_deg = max(deg.values())
-		avg = np.average(np.array(deg.values()))
-		med = np.median(np.array(deg.values()))
-		self._expected_avg_deg = med
-		#
-		# print('	Obs: max {} min {} avg {} med {}'.format(max_deg, min_deg, avg, med))
-		# print('	Act: max {} min {}'.format(act_max_deg, act_min_deg))
-
-		deg_open = current_g.degree(open_nodes)
-		s_deg = _mylib.sortDictByValues(deg_open, reverse=True)
-		max_deg_open = s_deg[0][1]
-
-		self._wt_den = max_deg / self._expected_avg_deg
-		self._starting_wt = self._wt_den
-
-		#print('	Weight set to {} \t Max deg open {}'.format(self._wt_den, max_deg_open))
-		print(p_bfs_budget, average_deg, self._expected_avg_deg, avg)
-		line = [p_bfs_budget, self._bfs_count, average_deg, med, avg]
-
-		# with open('./log/bfs-sample-'+dataset+'.csv', "a") as csv_file:
-		# 	writer = csv.writer(csv_file, delimiter=',')
-		# 	writer.writerow(line)
-
-		#self._budget = 0
 
 	def _bfs(self):
 
@@ -2182,6 +1992,9 @@ class UndirectedSingleLayer(object):
 			# deg_obs = degree_observed_sorted[0][1]
 
 
+
+
+
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 
@@ -2192,7 +2005,6 @@ class UndirectedSingleLayer(object):
 
 		min_val = min(obs_deg.values())
 		max_val = max(obs_deg.values())
-		#avg_val = np.average(np.array(obs_deg.values()))
 		score_d = dict()
 
 		top_k_nodes = []
@@ -2200,16 +2012,15 @@ class UndirectedSingleLayer(object):
 		for k, v in obs_deg.iteritems():
 			cc = nx.clustering(graph, k)
 			try:
-				#score_d[k] = ((v - min_val) / (max_val - min_val)) * (1 - cc)
-				score_d[k] = ((v - min_val) / (max_val - min_val))
+				score_d[k] = ((v - min_val) / (max_val - min_val)) * (1 - cc)
 			except ZeroDivisionError:
-				score_d[k] = v
+				score_d[k] = (v ) * (1 - cc)
 
 			top_k_nodes.append(self._query._graph.degree(k))
 
 		sorted_list = _mylib.sortDictByValues(score_d, reverse=True)
 		selected_node = sorted_list[0][0]
-		deg_node = obs_deg[selected_node]
+		deg_node = sorted_list[0][1]
 		sel_deg = self._query._graph.degree(selected_node)
 
 		return selected_node, deg_node
@@ -2237,108 +2048,6 @@ class UndirectedSingleLayer(object):
 		deg_node = obs_deg[selected_node]
 
 		return selected_node, deg_node
-
-	def _node_selection_bandit(self, candidates, c_nodes, o_nodes):
-
-		graph = self._sample_graph
-		obs_deg = graph.degree(candidates)
-
-		min_val = min(obs_deg.values())
-		max_val = max(obs_deg.values())
-		score_d = dict()
-
-		top_k_nodes = []
-		p_members = dict()
-		#current_p = community.best_partition(graph)
-		for k,v in obs_deg.iteritems():
-			cc = nx.clustering(graph, k)
-			#global_score = self._nbs_score(k, c_nodes, o_nodes, current_p)
-			try:
-				score_d[k] = (((v - min_val) / (max_val - min_val)) * (1 - cc))
-			except ZeroDivisionError:
-				score_d[k] = (v) * (1 - cc)
-
-		score_values = score_d.values()
-		size = len(score_values) / 4
-
-
-
-		cut_points = []
-		for n in [1,2,3]:
-			c = size * n
-			cut_points.append(c)
-
-		# Assign nodes to arm
-		arms = dict()
-
-		sorted_score = _mylib.sortDictByValues(score_d, reverse=True)
-
-		for v, t in enumerate(sorted_score):
-			k = t[0]
-			if v < cut_points[0]:
-				arms[1] = arms.get(1, list()) + [k]
-			elif cut_points[0] <= v < cut_points[1]:
-				arms[2] = arms.get(2, list()) + [k]
-			elif cut_points[1] <= v < cut_points[2]:
-				arms[3] = arms.get(3, list()) + [k]
-			elif cut_points[2] <= v:
-				arms[4] = arms.get(4, list()) + [k]
-
-
-		# Select arm
-		bandit = self._bandit
-
-
-
-
-		#print('score', bandit['score'])
-		if min(bandit['count'].values()) == 0:
-			for k,v in bandit['count'].iteritems():
-				if v == 0:
-					selected_arm = k
-					break
-			selected_node = random.choice(arms[selected_arm])
-		else:
-			arm_score = bandit['score']
-
-			sorted_arm_score = _mylib.sortDictByValues(arm_score,reverse=True)
-			selected_arm = int(sorted_arm_score[0][0])
-			#print(arms)
-			selected_node = random.choice(arms[selected_arm])
-
-
-
-
-
-
-		# shuffle_list = score_d.keys()
-		# random.shuffle(shuffle_list)
-		#
-		# TIPPING_POINT = int(0.37 * len(shuffle_list))
-		#
-		# print("		Tipping Pt", TIPPING_POINT)
-		#
-		# best_so_far = 0
-		# selected_node = shuffle_list[-1]
-		# for i, node in enumerate(shuffle_list):
-		# 	current = score_d[node]
-		# 	if i <= TIPPING_POINT:
-		# 		if current > best_so_far:
-		# 			best_so_far = current
-		# 		elif current == best_so_far:
-		# 			rand = random.uniform(0,1)
-		# 			if rand <= 0.5:
-		# 				best_so_far = current
-		# 	elif i > TIPPING_POINT:
-		# 		if current > best_so_far:
-		# 			best_so_far = current
-		# 			selected_node = node
-		# 			break
-
-
-		deg_node = obs_deg[selected_node]
-
-		return selected_node, deg_node, selected_arm
 
 	def _nbs_score(self, node, closed_nodes, open_nodes, p):
 
@@ -2697,17 +2406,8 @@ class UndirectedSingleLayer(object):
 		if top_k == 0:
 			candidates = obs_deg.keys()
 		else:
-			# candidates = list()
-			# tmp = list()
-			# for x in sorted_list[:top_k]:
-			# 	node = x[0]
-			# 	deg = x[1]
-			# 	tmp.append(node)
-			# 	if deg > 1:
-			# 		candidates.append(node)
-
-			# if len(candidates) == 0: candidates = tmp
 			candidates = [x[0] for x in sorted_list[:top_k]]
+
 		return candidates
 
 	def _getExpNodes(self):
@@ -2912,12 +2612,11 @@ class UndirectedSingleLayer(object):
 			"""
 			The main method that calls all the other methods
 			"""
-
+			#self._bfs()
 			current_list = []
 
-			if self._exp_type == 'exp-den' and self._bfs_count != 0:
-				self._bfs_init()
-				self._after_bfs()
+			sample_G = None
+			is_break = False
 
 			# Sample until budget runs out or thero are no more open nodes
 			while self._cost < self._budget:
@@ -2927,7 +2626,7 @@ class UndirectedSingleLayer(object):
 					current_list = list(self._sample['nodes']['open'])
 
 				# Perform expansion
-				if len(current_list) != 0 and self._densi_count != 1:
+				if len(current_list) != 0:
 					self._stage = 'exp'
 					self._exp_count += 1
 					if self._exp_type == 'oracle':
@@ -2935,7 +2634,7 @@ class UndirectedSingleLayer(object):
 						current = self._expansion_oracle(current_list)
 					elif self._exp_type == 'random-exp':
 						current = self._expansion_random(self._sample['nodes']['open'])
-					elif self._exp_type == 'exp-den':
+					elif 'exp-den' in self._exp_type:
 						print('		Start Expansion ..')
 						current = self._expansion_random(self._sample['nodes']['open'])
 						#current = self._expansion_cheat(self._sample['nodes']['open'])
@@ -2968,19 +2667,28 @@ class UndirectedSingleLayer(object):
 					self._cash_spread()
 				elif self._exp_type == 'k-rank':
 					self._k_rank()
-				elif self._exp_type == 'exp-den':
+				# elif self._exp_type == 'exp-den':
+				# 	current_list = self._densification(current)
+				# elif self._exp_type == 'man':
+				# 	self._max_avg_nbs()
+				elif self._exp_type == 'exp-den-0.2':
+					self._T = 0.2
 					current_list = self._densification(current)
-				elif self._exp_type == 'man':
-					self._max_avg_nbs()
+				elif self._exp_type == 'exp-den-0.5':
+					self._T = 0.5
+					current_list = self._densification(current)
+				elif self._exp_type == 'exp-den-0.7':
+					self._T = 0.7
+					current_list = self._densification(current)
 
 
-				#self._densi_count += 1
+				self._densi_count += 1
 
 				#print('			Budget spent: {}/{}'.format(self._cost, self._budget))
 
-			# print('			Number of nodes \t Close: {} \t Open: {}'.format( \
-			# 	len(self._sample['nodes']['close']), \
-			# 	len(self._sample['nodes']['open'])))
+			print('			Number of nodes \t Close: {} \t Open: {}'.format( \
+				len(self._sample['nodes']['close']), \
+				len(self._sample['nodes']['open'])))
 
 			"""
 			repititions = 0
@@ -3010,7 +2718,7 @@ def SaveToFile(results_nodes,results_edges, query_order, rank_order):
 	log.save_to_file(log_file_node, results_nodes)
 	#log.save_to_file(log_file_edge, results_edges)
 	#log.save_to_file(log_file_order, query_order)
-	#log.save_to_file(log_file_rank, rank_order)
+	log.save_to_file(log_file_rank, rank_order)
 
 
 def Append_Log(sample, type):
@@ -3047,7 +2755,6 @@ if __name__ == '__main__':
 	parser.add_argument('fname', help='Edgelist file', type=str)
 	parser.add_argument('-budget', help='Total budget', type=int, default=0)
 	parser.add_argument('-bfs_budget', help='Bfs budget', type=int, default=5)
-	parser.add_argument('-p_bfs_budget', help='Percent Bfs budget', type=float, default=.015)
 	parser.add_argument('-dataset', help='Name of the dataset', default=None)
 	parser.add_argument('-log', help='Log file', default='./log/')
 	parser.add_argument('-experiment', help='# of experiment', default=10)
@@ -3065,7 +2772,6 @@ if __name__ == '__main__':
 	fname = args.fname
 	budget = args.budget
 	bfs_budget = args.bfs_budget
-	p_bfs_budget = args.p_bfs_budget
 	dataset = args.dataset
 	log_file = args.log
 	k = args.k
@@ -3076,8 +2782,7 @@ if __name__ == '__main__':
 	debug = args.debug
 
 	if mode == 1:
-		#exp_list = ['med','mod','rw','exp-den']
-		exp_list = ['med','mod','rw','exp-den']
+		exp_list = ['med','mod','rw','exp-den-0.2','exp-den-0.5', 'exp-den-0.7']
 	elif mode == 2:
 		exp_list = ['mod','rw','exp-den']
 	elif mode == 3:
@@ -3101,7 +2806,6 @@ if __name__ == '__main__':
 
 		print('Original: # nodes', G.number_of_nodes())
 		graph = max(nx.connected_component_subgraphs(G), key=len)
-
 		print('LCC: # nodes', graph.number_of_nodes())
 		query = query.UndirectedSingleLayer(graph)
 		#oracle = oracle.Oracle(graph, dataset)
@@ -3115,16 +2819,10 @@ if __name__ == '__main__':
 
 		if budget == 0:
 			budget = int(.10*n)
-
-		bfs_budget = int(p_bfs_budget*n)
-		#bfs_budget = 0
-
-		print('** {} Budget set to {} and {} BFS, n={}'.format(dataset, budget, bfs_budget, n))
+		print('{} Budget set to {} , n={}'.format(dataset, budget, n))
 
 	print('-'*10)
 	print(nx.info(graph))
-	avg_true_deg = np.average(np.array(graph.degree().values()))
-
 	print('-' * 10)
 
 	for i in range(0, int(args.experiment)):
@@ -3132,16 +2830,14 @@ if __name__ == '__main__':
 
 		tmp = []
 		for type in exp_list:
-			# sample = UndirectedSingleLayer(query, oracle, budget, \
-			# 							   bfs_budget, type, dataset, log, k, is_cost,
-			# 							   log_interval)
+
 			sample = UndirectedSingleLayer(query, budget, bfs_budget, type, dataset, log, k, is_cost, log_interval)
 
 			if starting_node == -1:
 				#starting_node = sample._query.randomHighDegreeNode()
 				starting_node = sample._query.randomFromLargeCommunity(graph, dataset)
 
-			#print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
+			print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
 
 
 			# Getting sample
@@ -3161,18 +2857,5 @@ if __name__ == '__main__':
 
 		starting_node = -1
 
-	# # Create a figure instance
-	# fig = plt.figure(1, figsize=(9, 6))
-	# # Create an axes instance
-	# ax = fig.add_subplot(111)
-	# # Create the boxplot
-	# bp = ax.boxplot(sample._data_to_plot)
-	# # Save the figure
-	# fig.savefig('./draw/plot/'+dataset+'.png', bbox_inches='tight')
-	#
-	# _mylib.plotLineGraph([sample._chose_deg], log=False, title=dataset)
-	#
-	# print(len(sample._chose_deg), sample._chose_deg[0], sample._chose_deg[1])
-	# print(len(sample._data_to_plot))
-	if not debug and int(args.experiment) != 0:
+	if not debug:
 		SaveToFile(Log_result, Log_result_edges, Log_result_step_sel_node, Log_result_step_sel_rank)

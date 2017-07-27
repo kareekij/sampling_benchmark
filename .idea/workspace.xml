@@ -5,8 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="349b1696-223a-4689-83f7-e71b11445264" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/threshold_test.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/_mylib.py" afterPath="$PROJECT_DIR$/_mylib.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local_rank_approx.py" afterPath="$PROJECT_DIR$/local_rank_approx.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/multi_layers.py" afterPath="$PROJECT_DIR$/multi_layers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/query.py" afterPath="$PROJECT_DIR$/query.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sample.py" afterPath="$PROJECT_DIR$/sample.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
     </list>
     <ignored path="sampling_benchmark.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -18,15 +24,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/sampling_benchmark$reorder_twitter.coverage" NAME="reorder_twitter Coverage Results" MODIFIED="1496780821952" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$sim_edges.coverage" NAME="sim_edges Coverage Results" MODIFIED="1490322705562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$read_sqlite.coverage" NAME="read_sqlite Coverage Results" MODIFIED="1497286923863" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$adjust_cc.coverage" NAME="adjust_cc Coverage Results" MODIFIED="1487305690809" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$sim_epidemic.coverage" NAME="sim_epidemic Coverage Results" MODIFIED="1499828916342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$find_pattern.coverage" NAME="find_pattern Coverage Results" MODIFIED="1488780773192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$small_sample.coverage" NAME="small_sample Coverage Results" MODIFIED="1488827264059" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/sampling_benchmark$log.coverage" NAME="log Coverage Results" MODIFIED="1486586394947" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/sampling_benchmark$adjust_cc__1_.coverage" NAME="adjust_cc (1) Coverage Results" MODIFIED="1488140940124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/sampling_benchmark$local_community.coverage" NAME="local_community Coverage Results" MODIFIED="1490184690817" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sampling_benchmark$sim_edges.coverage" NAME="sim_edges Coverage Results" MODIFIED="1490322705562" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sampling_benchmark$sample.coverage" NAME="sample Coverage Results" MODIFIED="1493355297256" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$sample.coverage" NAME="sample Coverage Results" MODIFIED="1496856823704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/sampling_benchmark$hyptothesis_test.coverage" NAME="hyptothesis_test Coverage Results" MODIFIED="1488739666922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sampling_benchmark$adjust_cc.coverage" NAME="adjust_cc Coverage Results" MODIFIED="1487305690809" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sampling_benchmark$find_pattern.coverage" NAME="find_pattern Coverage Results" MODIFIED="1488780773192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/sampling_benchmark$small_sample.coverage" NAME="small_sample Coverage Results" MODIFIED="1488827264059" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$multi_sample.coverage" NAME="multi-sample Coverage Results" MODIFIED="1496799230357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$gen_common.coverage" NAME="gen_common Coverage Results" MODIFIED="1496796918674" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/sampling_benchmark$test.coverage" NAME="test Coverage Results" MODIFIED="1497283527435" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -44,126 +56,66 @@
     <favorites_list name="sampling_benchmark" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.57737005">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="_mylib.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/_mylib.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="40" column="28" lean-forward="false" selection-start-line="40" selection-start-column="28" selection-end-line="40" selection-end-column="28" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="sample.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/sample.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="472">
-                  <caret line="2249" column="41" lean-forward="true" selection-start-line="2249" selection-start-column="41" selection-end-line="2249" selection-end-column="41" />
-                  <folding>
-                    <element signature="e#68#115#0" expanded="true" />
-                    <element signature="e#34471#35219#0" expanded="false" />
-                    <element signature="e#36052#37149#0" expanded="false" />
-                    <element signature="e#37185#38379#0" expanded="false" />
-                    <element signature="e#43464#43625#0" expanded="false" />
-                    <element signature="e#53838#54958#0" expanded="false" />
-                    <element signature="e#55003#55576#0" expanded="false" />
-                    <element signature="e#55615#56514#0" expanded="false" />
-                    <element signature="e#56553#56757#0" expanded="false" />
-                    <element signature="e#56786#59340#0" expanded="false" />
-                    <element signature="e#59372#59487#0" expanded="false" />
-                    <element signature="e#59511#62078#0" expanded="false" />
-                    <element signature="e#62118#63188#0" expanded="false" />
-                    <element signature="e#63237#63565#0" expanded="false" />
-                    <element signature="e#63601#64443#0" expanded="false" />
-                    <element signature="e#64472#65211#0" expanded="false" />
-                    <element signature="e#65252#65682#0" expanded="false" />
-                    <element signature="e#65938#66484#0" expanded="false" />
-                    <element signature="e#74104#74656#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="community.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/community.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="313">
-                  <caret line="266" column="25" lean-forward="true" selection-start-line="266" selection-start-column="25" selection-end-line="266" selection-end-column="25" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="query.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/query.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="348">
-                  <caret line="45" column="28" lean-forward="false" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="28" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="log.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/log.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1395">
-                  <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="find_pattern.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/find_pattern.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="30">
-                  <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="15" selection-end-column="20" />
-                  <folding>
-                    <element signature="e#0#47#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="sample.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/sample.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="214">
-                  <caret line="1760" column="0" lean-forward="true" selection-start-line="1760" selection-start-column="0" selection-end-line="1761" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#68#115#0" expanded="true" />
-                    <element signature="e#34471#35219#0" expanded="false" />
-                    <element signature="e#36052#37149#0" expanded="false" />
-                    <element signature="e#37185#38379#0" expanded="false" />
-                    <element signature="e#43464#43625#0" expanded="false" />
-                    <element signature="e#53838#54958#0" expanded="false" />
-                    <element signature="e#55003#55576#0" expanded="false" />
-                    <element signature="e#55615#56514#0" expanded="false" />
-                    <element signature="e#56553#56757#0" expanded="false" />
-                    <element signature="e#56786#59340#0" expanded="false" />
-                    <element signature="e#59372#59487#0" expanded="false" />
-                    <element signature="e#59511#62078#0" expanded="false" />
-                    <element signature="e#62118#63188#0" expanded="false" />
-                    <element signature="e#63237#63565#0" expanded="false" />
-                    <element signature="e#63601#64443#0" expanded="false" />
-                    <element signature="e#64472#65211#0" expanded="false" />
-                    <element signature="e#65252#65682#0" expanded="false" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="_mylib.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/_mylib.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="945">
+              <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sample.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/sample.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="435">
+              <caret line="124" column="55" lean-forward="true" selection-start-line="124" selection-start-column="55" selection-end-line="124" selection-end-column="55" />
+              <folding>
+                <element signature="e#68#115#0" expanded="true" />
+                <element signature="e#47408#48505#0" expanded="false" />
+                <element signature="e#48541#49735#0" expanded="false" />
+                <element signature="e#49764#51435#0" expanded="false" />
+                <element signature="e#51512#52041#0" expanded="false" />
+                <element signature="e#52065#54500#0" expanded="false" />
+                <element signature="e#69637#71976#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="read_sqlite.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/read_sqlite.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1005">
+              <caret line="71" column="0" lean-forward="false" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#47#0" expanded="true" />
+                <marker date="1497643840000" expanded="true" signature="976:1013" ph="SELECT * fro... subreddits" />
+                <marker date="1497643840000" expanded="true" signature="976:1016" ph="SELECT id fr... subreddits" />
+                <marker date="1497643840000" expanded="true" signature="976:1017" ph="SELECT id fr... subreddits" />
+                <marker date="1497643840000" expanded="true" signature="1311:1347" ph="SELECT * fro... edges" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="5" column="48" lean-forward="false" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -174,36 +126,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>arm</find>
-      <find>,</find>
-      <find>pick_arm</find>
-      <find>update_arm</find>
-      <find>cash</find>
-      <find>dict</find>
-      <find>_init_bandit_g_rw</find>
-      <find>bfs</find>
-      <find>_random_walk</find>
-      <find>med</find>
-      <find>_query</find>
+      <find>_generate</find>
+      <find>gene</find>
+      <find>after_bfs</find>
+      <find>_densification</find>
+      <find>gener</find>
+      <find>_densi_count</find>
+      <find>obs: {}</find>
+      <find>obs:{}</find>
+      <find>getDen</find>
+      <find>_getDenNodes</find>
+      <find>_scoreDen</find>
+      <find>scoreExp</find>
+      <find>aftre</find>
+      <find>print('{}</find>
+      <find>_densification(</find>
+      <find>densification</find>
+      <find>_wt_den</find>
+      <find>densification(</find>
+      <find>plt</find>
       <find>generate</find>
-      <find>_test</find>
-      <find>k_rank</find>
-      <find>_max_on</find>
-      <find>_increment_cost</find>
-      <find>_count_new_nodes</find>
-      <find>_max_obs</find>
-      <find>ran</find>
-      <find>save_</find>
-      <find>Log_result_nn</find>
-      <find>_track_new_nodes</find>
-      <find>_</find>
-      <find>_track_</find>
-      <find>rank</find>
-      <find>_max_ob</find>
-      <find>_k_rank</find>
-      <find>dataset</find>
-      <find>get_excesss</find>
-      <find>excess</find>
+      <find>ac</find>
+      <find>avg_true_deg</find>
+      <find>act_avg_deg</find>
+      <find>bfs</find>
+      <find>_after_bfs</find>
+      <find>self._budget</find>
+      <find>after</find>
+      <find>scoreDen</find>
+      <find>self._wt_</find>
+      <find>self._wt_den</find>
     </findStrings>
     <replaceStrings>
       <replace>,</replace>
@@ -220,33 +172,24 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/local_community.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/multi_layers.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/local_rank_approx.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/_mylib.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/sample_multi.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/threshold_test.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/multi_sample.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/read_sqlite.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/log.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/visual.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/local_community.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/_mylib.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/sim_epidemic.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/sample.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/query.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/sim_edges.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/log/avg-200.txt" />
-        <option value="$PROJECT_DIR$/find_pattern.py" />
-        <option value="$PROJECT_DIR$/log/com-size-25-1.txt" />
-        <option value="$PROJECT_DIR$/log/com-size-25-2.txt" />
-        <option value="$PROJECT_DIR$/log/com-size-25-3.txt" />
-        <option value="$PROJECT_DIR$/log/com-size-25-4.txt" />
-        <option value="$PROJECT_DIR$/LFR-benchmark/run-gen-cc.sh" />
-        <option value="$PROJECT_DIR$/run-gen-cc.sh" />
-        <option value="$PROJECT_DIR$/adjust_cc.py" />
-        <option value="$PROJECT_DIR$/data/mention_network.csv" />
-        <option value="$PROJECT_DIR$/log/grad.txt" />
-        <option value="$PROJECT_DIR$/LFR-benchmark/run.sh" />
-        <option value="$PROJECT_DIR$/LFR-benchmark/parameters.dat" />
-        <option value="$PROJECT_DIR$/../../../CIS700-ComplexNetworks/assignments/project1/Network-Statistics/stats2.txt" />
-        <option value="$PROJECT_DIR$/data/socfb-Amherst41.mtx" />
-        <option value="$PROJECT_DIR$/hyptothesis_test.py" />
-        <option value="$PROJECT_DIR$/log/small_sample.py" />
         <option value="$PROJECT_DIR$/log/wiki_edges.txt" />
         <option value="$PROJECT_DIR$/small_sample.py" />
         <option value="$PROJECT_DIR$/data3/socfb-Syracuse56.mtx" />
@@ -277,9 +220,26 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/log.py" />
         <option value="$PROJECT_DIR$/sim_edges.py" />
-        <option value="$PROJECT_DIR$/_mylib.py" />
         <option value="$PROJECT_DIR$/data/twitter2/twitter_friends.csv" />
         <option value="$PROJECT_DIR$/log/grad_edges_order.txt" />
+        <option value="$PROJECT_DIR$/reorder_twitter.py" />
+        <option value="$PROJECT_DIR$/data/twitter/twitter_friends_edges.csv" />
+        <option value="$PROJECT_DIR$/gen_common.py" />
+        <option value="$PROJECT_DIR$/multi-sample.py" />
+        <option value="$PROJECT_DIR$/baselines.py" />
+        <option value="$PROJECT_DIR$/multi_sample.py" />
+        <option value="$PROJECT_DIR$/read_sqlite.py" />
+        <option value="$PROJECT_DIR$/merge_snapshot.py" />
+        <option value="$PROJECT_DIR$/sample_multi.py" />
+        <option value="$PROJECT_DIR$/log/epicdemic.txt" />
+        <option value="$PROJECT_DIR$/sim_epidemic.py" />
+        <option value="$PROJECT_DIR$/threshold_test.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/inspect_graph.py" />
+        <option value="$PROJECT_DIR$/multi_layers.py" />
+        <option value="$PROJECT_DIR$/local_rank_approx.py" />
+        <option value="$PROJECT_DIR$/_mylib.py" />
+        <option value="$PROJECT_DIR$/query.py" />
         <option value="$PROJECT_DIR$/sample.py" />
       </list>
     </option>
@@ -309,8 +269,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -337,6 +297,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sampling_benchmark" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sampling_benchmark" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="data" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -356,11 +330,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/log" />
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/log" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.sample">
+  <component name="RunManager" selected="Python.sim_epidemic">
     <configuration default="false" name="sample" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -375,7 +349,79 @@
       <module name="sampling_benchmark" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sample.py" />
-      <option name="PARAMETERS" value="./data/data3/soc-hamsterster.edges -mode 1 -experiment 10" />
+      <option name="PARAMETERS" value="./data/twitter-reorder/twitter_friends_edges_common.pickle" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="multi-sample" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="sampling_benchmark" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/multi_sample.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="read_sqlite" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="sampling_benchmark" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/read_sqlite.py" />
+      <option name="PARAMETERS" value="-mode 2 -experiment 1 -budget 20" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="sampling_benchmark" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="-mode 2 -experiment 1 -budget 20" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="sim_epidemic" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="/usr/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="sampling_benchmark" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sim_epidemic.py" />
+      <option name="PARAMETERS" value="-mode 2 -experiment 1 -budget 20" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
@@ -621,12 +667,20 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <list size="1">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.sample" />
+      <item index="1" class="java.lang.String" itemvalue="Python.multi-sample" />
+      <item index="2" class="java.lang.String" itemvalue="Python.read_sqlite" />
+      <item index="3" class="java.lang.String" itemvalue="Python.test" />
+      <item index="4" class="java.lang.String" itemvalue="Python.sim_epidemic" />
     </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Python.sample" />
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="Python.sim_epidemic" />
+        <item index="1" class="java.lang.String" itemvalue="Python.read_sqlite" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test" />
+        <item index="3" class="java.lang.String" itemvalue="Python.sample" />
+        <item index="4" class="java.lang.String" itemvalue="Python.multi-sample" />
       </list>
     </recent_temporary>
   </component>
@@ -714,7 +768,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492789937600</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="sync after attempt to improve performance in Densification">
+      <created>1499289191972</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1499289191972</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -731,24 +792,24 @@
     <editor active="false" />
     <layout>
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46607432" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3013834" sideWeight="0.17678382" order="11" side_tool="false" content_ui="combo" x="146" y="342" width="250" height="693" />
+      <window_info id="Project" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23913044" sideWeight="0.16453674" order="11" side_tool="false" content_ui="combo" x="146" y="342" width="250" height="693" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35032538" sideWeight="0.49676898" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27114967" sideWeight="0.42917997" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19466403" sideWeight="0.29286474" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.45899895" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12939297" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19466403" sideWeight="0.70713526" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3083004" sideWeight="0.5543131" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32608697" sideWeight="0.45260915" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.041533545" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3083004" sideWeight="0.4456869" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3250988" sideWeight="0.5623003" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28656125" sideWeight="0.44462195" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42759562" sideWeight="0.30775446" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41007906" sideWeight="0.13951011" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3504673" sideWeight="0.49676898" order="6" side_tool="false" content_ui="tabs" />
@@ -805,43 +866,44 @@
     <MESSAGE value="update gitignore" />
     <MESSAGE value="Add local com, gen-edge step com obs." />
     <MESSAGE value="volatile-MAB, SEC by common neighbors" />
-    <option name="LAST_COMMIT_MESSAGE" value="volatile-MAB, SEC by common neighbors" />
+    <MESSAGE value="sync after attempt to improve performance in Densification" />
+    <option name="LAST_COMMIT_MESSAGE" value="sync after attempt to improve performance in Densification" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sample.py</url>
-          <line>1723</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sample.py</url>
-          <line>1816</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sample.py</url>
-          <line>1761</line>
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/sample.py</url>
-          <line>2352</line>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/log.py</url>
           <line>97</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sample_multi.py</url>
+          <line>2811</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/multi_layers.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/sample.py</url>
-          <line>2061</line>
-          <option name="timeStamp" value="33" />
+          <line>1255</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sample.py</url>
+          <line>1531</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sample.py</url>
+          <line>3043</line>
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="36" />
+      <option name="time" value="42" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -853,101 +915,10 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/control_exp/control-deg-2-edge.csv" />
-    <entry file="file://$PROJECT_DIR$/control_exp/control-deg-2-node.csv" />
-    <entry file="file://$PROJECT_DIR$/control_exp/control-mix-1-edge.csv" />
-    <entry file="file://$PROJECT_DIR$/control_exp/control-mix-2-node.csv" />
-    <entry file="file://$PROJECT_DIR$/LFR-benchmark/gen/multi-mixing-0.2/1/community.dat" />
-    <entry file="file://$PROJECT_DIR$/hyptothesis_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="35" column="27" lean-forward="true" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/run_multi_graph.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="0" lean-forward="true" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/gen_order.txt" />
-    <entry file="file://$PROJECT_DIR$/inspect_graph.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/find_pattern.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="15" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#47#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/oracle.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="19" column="62" lean-forward="true" selection-start-line="14" selection-start-column="8" selection-end-line="19" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/test.txt" />
-    <entry file="file://$PROJECT_DIR$/log/test2.txt" />
-    <entry file="file://$PROJECT_DIR$/log/com-step-rw.txt" />
-    <entry file="file://$PROJECT_DIR$/log/com-step-mod-5.txt" />
-    <entry file="file://$PROJECT_DIR$/log/com-step-mod.txt" />
-    <entry file="file://$PROJECT_DIR$/data/data3/socfb-Syracuse56.mtx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="300530" column="9" lean-forward="true" selection-start-line="300530" selection-start-column="9" selection-end-line="300530" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/ca-Erdos992-com-step-mod.txt" />
-    <entry file="file://$PROJECT_DIR$/log/com-step/ca-Erdos992-com-step-mod.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="6" lean-forward="true" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/mixing-0.2_n.txt" />
-    <entry file="file://$PROJECT_DIR$/log/grad_edges_hyb.txt" />
-    <entry file="file://$PROJECT_DIR$/log/multi-mixing-0_hyb.txt" />
-    <entry file="file://$PROJECT_DIR$/log/socfb-Syracuse56_order.txt" />
-    <entry file="file://$PROJECT_DIR$/log/socfb-Syracuse56_n.txt" />
-    <entry file="file://$PROJECT_DIR$/log/socfb-Syracuse56_hyb.txt" />
     <entry file="file://$PROJECT_DIR$/log/socfb-Syracuse56_e.txt" />
     <entry file="file://$PROJECT_DIR$/log/ca-Erdos992_order.txt" />
-    <entry file="file://$PROJECT_DIR$/sim_from_file.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-460">
-          <caret line="95" column="28" lean-forward="false" selection-start-line="95" selection-start-column="28" selection-end-line="95" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/log/multi-mixing-0.2_order.txt" />
-    <entry file="file://$PROJECT_DIR$/log/com-step/multi-mixing-0.2-com-step-rw.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="11" lean-forward="true" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/log/com-step/multi-mixing-0.2-com-step-rw.txt" />
     <entry file="file://$PROJECT_DIR$/log/socfb-Bingham82_n.txt" />
     <entry file="file://$PROJECT_DIR$/log/ca-Erdos992_hyb.txt" />
     <entry file="file://$PROJECT_DIR$/log/ca-Erdos992_e.txt" />
@@ -968,13 +939,7 @@
     <entry file="file://$PROJECT_DIR$/log/soc-hamsterster_n.txt" />
     <entry file="file://$PROJECT_DIR$/log/ca-Erdos992_n.txt" />
     <entry file="file://$PROJECT_DIR$/log/grad_edges_e.txt" />
-    <entry file="file://$PROJECT_DIR$/data/twitter2/twitter_friends.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="81">
-          <caret line="15" column="18" lean-forward="true" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/twitter2/twitter_friends.csv" />
     <entry file="file://$PROJECT_DIR$/networkx2gt.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="435">
@@ -982,102 +947,192 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/log.py">
+    <entry file="file://$PROJECT_DIR$/log/grad_edges_n.txt" />
+    <entry file="file://$PROJECT_DIR$/log/grad_edges_order.txt" />
+    <entry file="file://$PROJECT_DIR$/log/50-Wiki-Vote_n.txt" />
+    <entry file="file://$PROJECT_DIR$/log/grad_edges_rank.txt" />
+    <entry file="file://$USER_HOME$/CIS700-ComplexNetworks/assignments/project1/Network-Statistics/main.py" />
+    <entry file="file://$PROJECT_DIR$/data/twitter/twitter_friends_edges.csv" />
+    <entry file="file://$PROJECT_DIR$/gen_common.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1395">
-          <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="405">
+          <caret line="27" column="38" lean-forward="false" selection-start-line="27" selection-start-column="38" selection-end-line="27" selection-end-column="38" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/log/grad_edges_n.txt">
+    <entry file="file://$PROJECT_DIR$/reorder_twitter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="12" lean-forward="true" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
+        <state relative-caret-position="390">
+          <caret line="29" column="60" lean-forward="false" selection-start-line="29" selection-start-column="60" selection-end-line="29" selection-end-column="60" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_mylib.py">
+    <entry file="file://$PROJECT_DIR$/log/twitter_friends_edges_n.txt" />
+    <entry file="file://$PROJECT_DIR$/baselines.py" />
+    <entry file="file://$PROJECT_DIR$/find_pattern.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="40" column="28" lean-forward="false" selection-start-line="40" selection-start-column="28" selection-end-line="40" selection-end-column="28" />
-          <folding />
+        <state relative-caret-position="600">
+          <caret line="40" column="0" lean-forward="true" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/m_RC_2015-01_apple_n.txt" />
+    <entry file="file://$PROJECT_DIR$/log/RC_2015-01_iphone_n.txt" />
+    <entry file="file://$PROJECT_DIR$/log/m_RC_2015-01_apple_rank.txt" />
+    <entry file="file://$PROJECT_DIR$/log/RC_2015-01_games_rank.txt" />
+    <entry file="file://$PROJECT_DIR$/log/m_1_merge_apple_n.txt" />
+    <entry file="file://$PROJECT_DIR$/log/ca-GrQc_n.txt" />
+    <entry file="file://$PROJECT_DIR$/merge_snapshot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" column="43" lean-forward="false" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/ca-GrQc_rank.txt" />
+    <entry file="file://$PROJECT_DIR$/log/epicdemic.txt" />
+    <entry file="file://$PROJECT_DIR$/log/ca-Erdos992.txt" />
+    <entry file="file://$PROJECT_DIR$/sim_epidemic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="379">
+          <caret line="94" column="52" lean-forward="true" selection-start-line="94" selection-start-column="52" selection-end-line="94" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sim_from_file.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="79" column="22" lean-forward="true" selection-start-line="79" selection-start-column="22" selection-end-line="79" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/socfb-Amherst41_n.txt" />
+    <entry file="file://$PROJECT_DIR$/community.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="248" column="17" lean-forward="false" selection-start-line="248" selection-start-column="17" selection-end-line="248" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="5" column="48" lean-forward="false" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample_multi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="2013" column="30" lean-forward="true" selection-start-line="2013" selection-start-column="30" selection-end-line="2013" selection-end-column="30" />
+          <folding>
+            <element signature="e#68#115#0" expanded="false" />
+            <element signature="e#85875#86063#0" expanded="false" />
+            <element signature="e#86096#86834#0" expanded="false" />
+            <element signature="e#86875#87427#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inspect_graph.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="23" lean-forward="true" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/query.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="45" column="28" lean-forward="false" selection-start-line="45" selection-start-column="8" selection-end-line="45" selection-end-column="28" />
+        <state relative-caret-position="438">
+          <caret line="76" column="47" lean-forward="false" selection-start-line="76" selection-start-column="47" selection-end-line="76" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/read_sqlite.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1005">
+          <caret line="71" column="0" lean-forward="false" selection-start-line="71" selection-start-column="0" selection-end-line="71" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#47#0" expanded="true" />
+            <marker date="1497643840000" expanded="true" signature="976:1013" ph="SELECT * fro... subreddits" />
+            <marker date="1497643840000" expanded="true" signature="976:1016" ph="SELECT id fr... subreddits" />
+            <marker date="1497643840000" expanded="true" signature="976:1017" ph="SELECT id fr... subreddits" />
+            <marker date="1497643840000" expanded="true" signature="1311:1347" ph="SELECT * fro... edges" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_mylib.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="945">
+          <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="403">
+          <caret line="66" column="76" lean-forward="false" selection-start-line="66" selection-start-column="4" selection-end-line="66" selection-end-column="76" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/log/grad_edges_order.txt">
+    <entry file="file://$PROJECT_DIR$/threshold_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="991" column="17" lean-forward="false" selection-start-line="991" selection-start-column="17" selection-end-line="991" selection-end-column="17" />
+          <folding>
+            <element signature="e#68#115#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/multi_layers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#47#0" expanded="false" />
+            <element signature="e#9153#9425#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/local_rank_approx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="81" column="33" lean-forward="false" selection-start-line="81" selection-start-column="33" selection-end-line="81" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/log/50-Wiki-Vote_n.txt">
+    <entry file="file://$PROJECT_DIR$/multi_sample.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/log/grad_edges_rank.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../CIS700-ComplexNetworks/assignments/project1/Network-Statistics/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="418">
+          <caret line="37" column="50" lean-forward="false" selection-start-line="37" selection-start-column="50" selection-end-line="37" selection-end-column="50" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sample.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="472">
-          <caret line="2249" column="41" lean-forward="true" selection-start-line="2249" selection-start-column="41" selection-end-line="2249" selection-end-column="41" />
+        <state relative-caret-position="435">
+          <caret line="124" column="55" lean-forward="true" selection-start-line="124" selection-start-column="55" selection-end-line="124" selection-end-column="55" />
           <folding>
             <element signature="e#68#115#0" expanded="true" />
-            <element signature="e#34471#35219#0" expanded="false" />
-            <element signature="e#36052#37149#0" expanded="false" />
-            <element signature="e#37185#38379#0" expanded="false" />
-            <element signature="e#43464#43625#0" expanded="false" />
-            <element signature="e#53838#54958#0" expanded="false" />
-            <element signature="e#55003#55576#0" expanded="false" />
-            <element signature="e#55615#56514#0" expanded="false" />
-            <element signature="e#56553#56757#0" expanded="false" />
-            <element signature="e#56786#59340#0" expanded="false" />
-            <element signature="e#59372#59487#0" expanded="false" />
-            <element signature="e#59511#62078#0" expanded="false" />
-            <element signature="e#62118#63188#0" expanded="false" />
-            <element signature="e#63237#63565#0" expanded="false" />
-            <element signature="e#63601#64443#0" expanded="false" />
-            <element signature="e#64472#65211#0" expanded="false" />
-            <element signature="e#65252#65682#0" expanded="false" />
-            <element signature="e#65938#66484#0" expanded="false" />
-            <element signature="e#74104#74656#0" expanded="false" />
+            <element signature="e#47408#48505#0" expanded="false" />
+            <element signature="e#48541#49735#0" expanded="false" />
+            <element signature="e#49764#51435#0" expanded="false" />
+            <element signature="e#51512#52041#0" expanded="false" />
+            <element signature="e#52065#54500#0" expanded="false" />
+            <element signature="e#69637#71976#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/community.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="266" column="25" lean-forward="true" selection-start-line="266" selection-start-column="25" selection-end-line="266" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>

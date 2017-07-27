@@ -396,7 +396,7 @@ def get_rank_correlation(d_1, d_2, k=.5):
 
 	tau, p_value = stats.kendalltau(l_1, l_2)
 	print(k, round(tau,4), round(p_value,4))
-
+	return tau, p_value
 
 
 if __name__ == '__main__':

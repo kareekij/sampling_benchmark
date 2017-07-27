@@ -12,6 +12,7 @@ import networkx2gt
 from graph_tool.all import *
 import random
 import pickle
+import scipy.stats as stats
 
 def logToFileCSV(data,filename,isAppend=False):
     if isAppend: mode = 'a'
@@ -59,7 +60,7 @@ def plotLineGraph(lines,legend=None,title=None,x_axis_text=None, y_axis_text=Non
         if log:
             plt.semilogy(line)
         else:
-            plt.plot(line, marker='x',linestyle='')
+            plt.plot(line, marker='o',linestyle='-',markersize=3)
 
     if legend != None:
         plt.legend(legend, loc='upper left')
@@ -556,3 +557,24 @@ def get_max_values_from_dict(d, candidates=list()):
     #print(type(ix), type(max_val_index))
 
     return random.choice(list(keys[max_val_index])), max_val_index
+
+
+def get_rank_correlation(d_1, d_2, k=.5):
+	cutoff = int(k * len(d_1))
+	d_1_sorted = sortDictByValues(d_1,reverse=True)
+
+	l_1 = []
+	l_2 = []
+	for count, d in enumerate(d_1_sorted):
+		id = d[0]
+		val = d[1]
+
+		l_1.append(val)
+		l_2.append(d_2[id])
+
+		if count == cutoff:
+			#print(count)
+			break
+
+	tau, p_value = stats.kendalltau(l_1, l_2)
+	return tau, p_value

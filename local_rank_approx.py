@@ -3,6 +3,7 @@ import networkx as nx
 import argparse
 import _mylib
 import random
+import os
 import scipy.stats as stats
 
 
@@ -30,22 +31,27 @@ def get_rank_correlation(d_1, d_2, k=.5):
 	return k, tau, p_value
 
 def log_to_file(filename,i):
-	f = open(filename, 'a')
 
-	if i == 0:
+
+	if not os.path.exists(filename):
+		f = open(filename, 'a')
 		col_names = Logging.keys()
+		col_names = str(col_names).replace('\'','').replace('[','').replace(']','')
 		print(col_names, file=f)
-
-	print(Logging)
+	else:
+		f = open(filename, 'a')
 
 	for idx, v in enumerate(Logging['core']):
-		t = str(Logging[50][idx])
-		s = str(Logging[20][idx])
-		i = str(Logging[10][idx])
-		r = str(Logging['core'][idx])
-		se = str(Logging['ratio'][idx])
-		line = t +', '+ s +', ' + i +', ' + r +', '+ str(se)
-		#print(line)
+		line = []
+		for k in  Logging.keys():
+			line.append(Logging[k][idx])
+		# t = str(Logging['50'][idx])
+		# s = str(Logging['20'][idx])
+		# i = str(Logging['10'][idx])
+		# r = str(Logging['core'][idx])
+		# se = str(Logging['ratio'][idx])
+		# line = r +', '+ t +', '+ s +', ' + i +', ' + str(se)
+		line = str(line).replace('\'', '').replace('[', '').replace(']', '')
 		print(line, file=f)
 
 
@@ -73,52 +79,56 @@ if __name__ == '__main__':
 	print('LCC: # nodes', graph.number_of_nodes())
 
 	#int((percent/100) * graph.number_of_nodes())
-	for exp in range(0, 10):
-		print(exp, core)
-		core_nodes = random.sample(graph.nodes(), core)
-		periphery_nodes = set()
+	for core in [10, 50, 100, 500]:
 
-		for c in core_nodes:
-			nbs = set(graph.neighbors(c)) - set(core_nodes)
-			periphery_nodes.update(nbs)
+		for exp in range(0, 10):
+			print(exp, core)
+			core_nodes = random.sample(graph.nodes(), core)
+			periphery_nodes = set()
 
-
-
-		all_nodes = set(core_nodes).union(set(periphery_nodes))
-		sub_graph = graph.subgraph(all_nodes)
-		ratio = (sub_graph.number_of_nodes()/graph.number_of_nodes())
-		print('-'*10)
-		print('Core: {}, Peri:{} -- Total: {}'.format(len(core_nodes), len(periphery_nodes),
-													  len(core_nodes) + len(periphery_nodes)))
-		print('New subgraph size', sub_graph.number_of_nodes())
-		print('Original graph size', graph.number_of_nodes())
-		print('Ratio', ratio )
-		print('-' * 10)
+			for c in core_nodes:
+				nbs = set(graph.neighbors(c)) - set(core_nodes)
+				periphery_nodes.update(nbs)
 
 
-		act_deg = graph.degree()
-		obs_deg = sub_graph.degree()
 
-		predicted_set = set()
-		for n in sub_graph.nodes():
-			d1 = act_deg[n]
-			d2 = obs_deg[n]
+			all_nodes = set(core_nodes).union(set(periphery_nodes))
+			sub_graph = graph.subgraph(all_nodes)
+			ratio = (sub_graph.number_of_nodes()/graph.number_of_nodes())
+			print('-'*10)
+			print('Core: {}, Peri:{} -- Total: {}'.format(len(core_nodes), len(periphery_nodes),
+														  len(core_nodes) + len(periphery_nodes)))
+			print('New subgraph size', sub_graph.number_of_nodes())
+			print('Original graph size', graph.number_of_nodes())
+			print('Ratio', ratio )
+			print('-' * 10)
 
-			if d1 != d2:
-				predicted_set.add(n)
 
-		print(' > {} nodes are needed to be predicted'.format(len(predicted_set)))
+			act_deg = graph.degree()
+			obs_deg = sub_graph.degree()
 
-		obs_deg = sub_graph.degree(predicted_set)
-		act_deg = graph.degree(predicted_set)
+			predicted_set = set()
+			for n in sub_graph.nodes():
+				d1 = act_deg[n]
+				d2 = obs_deg[n]
 
-		for k in [50,20,10]:
-			k1, tau, p_value = get_rank_correlation(obs_deg, act_deg, k=50/100)
-			Logging[k] = Logging.get(k, list()) + [tau]
+				if d1 != d2:
+					predicted_set.add(n)
 
-		Logging['core'] = Logging.get('core', list()) + [core]
-		Logging['ratio'] = Logging.get('ratio', list()) + [ratio]
+			print(' > {} nodes are needed to be predicted'.format(len(predicted_set)))
 
-		log_to_file('./log/rank_' + dataset + '.txt', exp)
+			obs_deg = sub_graph.degree(predicted_set)
+			act_deg = graph.degree(predicted_set)
+
+			for idx, k in enumerate([100, 50,20,10]):
+				#k1, tau, p_value = get_rank_correlation(obs_deg, act_deg, k=k/100)
+				k1, tau, p_value = get_rank_correlation(act_deg, obs_deg , k=k / 100)
+				key = 'g'+str(k)
+				Logging[str(key)] = Logging.get(str(key), list()) + [tau]
+
+			Logging['core'] = Logging.get('core', list()) + [core]
+			Logging['ratio'] = Logging.get('ratio', list()) + [ratio]
+
+	log_to_file('./log/rank_' + dataset + '.txt', exp)
 
 

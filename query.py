@@ -79,7 +79,7 @@ class UndirectedSingleLayer(object):
 
 		degree = self._graph.degree(members)
 		degree_sorted = _mylib.sortDictByValues(degree, reverse=True)
-		size = int(.1 * len(degree))
+		size = int(.5 * len(degree))
 		degree_sorted = degree_sorted[:size]
 		return random.choice(degree_sorted)[0]
 
