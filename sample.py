@@ -132,7 +132,7 @@ class UndirectedSingleLayer(object):
 		self._p_value = []
 
 		self._expected_avg_deg = 0
-		self._wt_increment = 1
+		self._wt_increment = 10
 
 	def _expansion_random(self, candidate_list):
 		degree_observed = self._sample_graph.degree(candidate_list)
@@ -1281,8 +1281,8 @@ class UndirectedSingleLayer(object):
 
 		bound = int(.20*self._expected_avg_deg)
 
-		if deg_obs > (self._expected_avg_deg-bound):
-		#if deg_obs > avg_true_deg:
+		#if deg_obs > (self._expected_avg_deg-bound):
+		if deg_obs > avg_true_deg:
 			self._wt_den = self._wt_den + self._wt_increment
 
 		# if lower_b < deg_obs and deg_obs < upper_b:
@@ -3117,7 +3117,7 @@ if __name__ == '__main__':
 			budget = int(.10*n)
 
 		bfs_budget = int(p_bfs_budget*n)
-		#bfs_budget = 0
+		bfs_budget = 0
 
 		print('** {} Budget set to {} and {} BFS, n={}'.format(dataset, budget, bfs_budget, n))
 
