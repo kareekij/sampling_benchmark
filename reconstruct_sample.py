@@ -19,23 +19,28 @@ def read_file_step(fn):
 
 	file = open(fn, "r")
 	a = []
+	header = dict()
 	with open(fn, 'rb') as f:
 		reader = csv.reader(f, delimiter=',')
 		for i, row in enumerate(reader):
 			if i != 0:
 				t = ([int(x.replace('u', '').replace('\'', '').replace(' ', '')) for x in row])
 				a.append(t)
+			else:
+				for idx, x in enumerate(row):
+					header[x.replace(' ','')] = idx
 
-	a = np.array(a).transpose()
-	return a
+	data = np.array(a).transpose()
+	return data, header
 
 def get_line(a, set=0, id=0):
-	offset = int(max(a[2].tolist()))
+	budget_id = header['budget']
+	offset = int(max(a[budget_id].tolist()))
 
-	print(' 	offset:', offset)
+	print(' 	offset: {} length: {}'.format(offset, len(a[0])))
 	start = set*offset
 	end = (set*offset + offset)-1
-	#print('		start {} : end {}'.format(start, end))
+	print('		start {} : end {}'.format(start, end))
 
 	r = (a[id][start:end+1])
 
@@ -83,7 +88,7 @@ def simulate_new_nodes(steps):
 	# Start simulating.
 	for i, step in enumerate(steps):
 		# Track current community
-		cur_com = p[step]
+		#cur_com = p[step]
 
 
 		nodes, edges, c = query.neighbors(str(step))
@@ -94,11 +99,11 @@ def simulate_new_nodes(steps):
 			sample_graph.add_edge(e[0], e[1])
 
 		if i % 10 == 0:
-			com_steps.append(cur_com)
+			#com_steps.append(cur_com)
 			new_node_steps.append(len(new_nodes))
 
 
-	return sample_graph, com_steps, new_node_steps
+	return sample_graph, new_node_steps
 
 
 def get_communities(G, dataset):
@@ -159,8 +164,15 @@ def get_members(graph, p):
 	for p_label in set(p.values()):
 		members = _mylib.get_members_from_com(p_label,p)
 		d[p_label] = members.tolist()
-
 	return d
+
+def save_sample(sample_graph, output):
+	if not os.path.exists(save_path):
+		os.makedirs(save_path)
+
+
+	pickle.dump(sample_graph, open(output, 'wb'))
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -177,88 +189,90 @@ if __name__ == '__main__':
 		f = fname.split('.')[1].split('/')[-1]
 		dataset = f
 
-
 	G = _mylib.read_file(fname)
-
-	graph = max(nx.connected_component_subgraphs(G), key=len)
-	p = get_communities(graph, dataset)
-	members_dict = get_members(graph,p)
-
 	query = query.UndirectedSingleLayer(G)
 
+	PATH = '/Users/Katchaguy/Google Drive/results/imc2017/'
+	#PATH = "E:\\Works\\OneDrive\\PhD\\Research\\results\\imc2017\\"
+	save_path = "./data-control-real/" + dataset + "/"
 
+	fn = PATH + 'realworld' + '/' + dataset + '_order.txt'
+
+	ALGO_LIST = ['bfs', 'mod', 'rw']
 
 	Log_result = {}
-	fn = './log/' + dataset + '_order.txt'
-	print(fn)
 
-	print(dataset, fn)
+	print('Dataset: {} Path: {} '.format(dataset, fn))
 
-	a = read_file_step(fn)
+	data, header = read_file_step(fn)
 
-	print(G.number_of_nodes())
-	print(graph.number_of_nodes())
-
-	if type == 'mod':
-		idx = 3
-	elif type == 'rw':
-		idx = 0
-
-	to_log = []
-	to_log.append(dataset)
-
-	#for id in [0,1,3,4,5]:
-	# 0: rw, 5: mod
-	for id in [idx]:
-
-		nodes_count_all = []
-		edges_count_all = []
+	for algo in ALGO_LIST:
+		algo_id = header[algo]
+		sample_graph = nx.Graph()
 		for trial in range(0, 10):
-			print('Running .. method: {} trial: {}'.format(id, trial+1))
+			output = save_path + algo + "_" + str(trial) + ".pickle"
 
-			steps, budget = get_line(a, set=trial, id=id)
+			if os.path.isfile(output):
+				print('File {} exists'.format(output))
+				continue
+
+			print('Running .. method: {} {} trial: {}'.format(algo, algo_id, trial + 1))
+			steps, budget = get_line(data, set=trial, id=algo_id)
 			cost = 0
 			sample_graph = nx.Graph()
 
 			queried_nodes = (np.array(steps, dtype=str).tolist())
-			#sample_graph, com_steps, new_node_steps, ratio_found_steps = simulate(queried_nodes)
-			sample_graph, com_steps, new_node_steps = simulate_new_nodes(queried_nodes)
 
+			sample_graph, new_node_steps = simulate_new_nodes(queried_nodes)
 
 			nodes_count = sample_graph.number_of_nodes()
 			edges_count = sample_graph.number_of_edges()
 
 			print('	nodes: {} edge: {}'.format(nodes_count, edges_count))
 
-
-			com_steps = label_reordering(com_steps)
-
-			#write_to_file('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, ratio_found_steps, trial)
-			write_to_file_nn('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, trial)
+			save_sample(sample_graph, output)
 
 
 
 
 
-
-
-	# 		if id == 0:
-	# 			if 'budget' not in Log_result:
-	# 				b = [x for x in range(1, int(budget) + 1)]
-	# 				Log_result['budget'] = list(b)
-	# 			else:
-	# 				Log_result['budget'] += list(b)
-	# 				print(' log', len(Log_result['budget']), len(b))
+	# print(G.number_of_nodes())
+	# print(graph.number_of_nodes())
 	#
-	# 	if id == 0: name = 'rw'
-	# 	elif id == 1: name = 'random'
-	# 	elif id == 3: name = 'bfs'
-	# 	elif id == 4: name = 'sb'
-	# 	elif id == 5: name = 'mod'
+	# if type == 'mod':
+	# 	idx = 3
+	# elif type == 'rw':
+	# 	idx = 0
 	#
-	# 	Log_result[name] = track_edges
+	# to_log = []
+	# to_log.append(dataset)
+	#
+	# #for id in [0,1,3,4,5]:
+	# # 0: rw, 5: mod
+	# for id in [idx]:
+	#
+	# 	nodes_count_all = []
+	# 	edges_count_all = []
+	# 	for trial in range(0, 10):
+	# 		print('Running .. method: {} trial: {}'.format(id, trial+1))
+	#
+	# 		steps, budget = get_line(a, set=trial, id=id)
+	# 		cost = 0
+	# 		sample_graph = nx.Graph()
+	#
+	# 		queried_nodes = (np.array(steps, dtype=str).tolist())
+	# 		#sample_graph, com_steps, new_node_steps, ratio_found_steps = simulate(queried_nodes)
+	# 		sample_graph, com_steps, new_node_steps = simulate_new_nodes(queried_nodes)
 	#
 	#
-	# SaveToFile(Log_result)
-
+	# 		nodes_count = sample_graph.number_of_nodes()
+	# 		edges_count = sample_graph.number_of_edges()
+	#
+	# 		print('	nodes: {} edge: {}'.format(nodes_count, edges_count))
+	#
+	#
+	# 		com_steps = label_reordering(com_steps)
+	#
+	# 		#write_to_file('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, ratio_found_steps, trial)
+	# 		# write_to_file_nn('./log/com-step/'+dataset+'-com-step-'+ type +'.txt',com_steps, new_node_steps, trial)
 

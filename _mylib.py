@@ -8,10 +8,17 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import collections
-import networkx2gt
-from graph_tool.all import *
-import random
 
+
+import random
+import pickle
+import scipy.stats as stats
+
+try:
+    import networkx2gt
+    from graph_tool.all import *
+except ImportError:
+    pass
 
 def logToFileCSV(data,filename,isAppend=False):
     if isAppend: mode = 'a'
@@ -59,7 +66,7 @@ def plotLineGraph(lines,legend=None,title=None,x_axis_text=None, y_axis_text=Non
         if log:
             plt.semilogy(line)
         else:
-            plt.plot(line)
+            plt.plot(line, marker='o',linestyle='-',markersize=3)
 
     if legend != None:
         plt.legend(legend, loc='upper left')
@@ -351,7 +358,7 @@ def degreeHist(deg,log_log=True, save=True):
 
     plt.figure()
     plt.grid(True)
-    if log_log: plt.loglog(values, hist ,'r', marker='x')
+    if log_log: plt.loglog(values, hist ,'r', marker='o', markersize=3)
     else: plt.plot(values, hist, 'r-')
 
     # plt.legend(['In-degree','Out-degree']#)
@@ -376,8 +383,8 @@ def degreeHist_2(deg_l,log_log=True, save=True, legend=['In-degree','Out-degree'
     plt.figure()
     plt.grid(True)
     if log_log:
-        plt.loglog(values_1, hist_1, 'r')
-        plt.loglog(values_2, hist_2, 'b')
+        plt.loglog(values_1, hist_1, 'r', marker='o', markersize=3)
+        plt.loglog(values_2, hist_2, 'b', marker='o', markersize=3)
     else:
         plt.plot(values_1, hist_1, 'r')
         plt.plot(values_2, hist_2, 'b')
@@ -395,6 +402,28 @@ def degreeHist_2(deg_l,log_log=True, save=True, legend=['In-degree','Out-degree'
         plt.savefig('./draw/plot/deg_2_' + str(time.time()) + '.png')
 
     plt.clf()
+
+def distributionPlot(deg,log_log=True, save=True, y_label="Freq", x_label="value", title=""):
+    values = (sorted(deg))
+    hist = [deg.count(x) for x in (values)]
+
+    plt.figure()
+    plt.grid(True)
+    if log_log: plt.loglog(values, hist ,'r', marker='o', markersize=2)
+    else: plt.scatter(values, hist, s=2)
+
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title('distribution '+ title)
+
+    if not save:
+        plt.show()
+    else:
+        plt.savefig('./draw/plot/distribution' + str(time.time()) + '.png')
+
+    plt.clf()
+
 
 def calculate_density(g):
     n = g.number_of_nodes()
@@ -496,14 +525,62 @@ def read_mtx_file(fname):
 def read_file(fname):
     ext = fname.split('.')[-1]
 
-    print(' Reading.. {} format'.format(ext))
+    print('     < Reading.. \'{}\' format, {} '.format(ext, fname))
     if ext == 'mtx' or ext == 'edges':
         edges_list = read_mtx_file(fname)
         G = nx.Graph()
         G.add_edges_from(edges_list)
-
-    # elif ext == 'edges':
-    #     G = nx.read_edgelist(fname, comments="%")
+    elif ext == 'pickle':
+        G = pickle.load(open(fname, 'rb'))
     else:
         G = nx.read_edgelist(fname)
     return G
+
+def get_keys_by_value(d, target_val=0):
+    keys = np.array(d.keys())
+    vals = np.array(d.values())
+
+    indices = np.where(vals == target_val)[0]
+    return keys[indices].tolist()
+
+def get_max_values_from_dict(d, candidates=list()):
+    if len(candidates) == 0:
+        candidates = list(d.keys())
+
+
+    keys = np.array(d.keys())
+    vals = np.array(d.values())
+
+    # Index of all candidates
+    ix = np.in1d(keys.ravel(), candidates).reshape(keys.shape)
+
+    # Get all the values of candidates and find the max
+    max_val = np.amax(vals[np.where(ix)])
+
+    # Get all indices of max value
+    max_val_index = np.where(vals == max_val)
+
+    #print(type(ix), type(max_val_index))
+
+    return random.choice(list(keys[max_val_index])), max_val_index
+
+
+def get_rank_correlation(d_1, d_2, k=.5):
+	cutoff = int(k * len(d_1))
+	d_1_sorted = sortDictByValues(d_1,reverse=True)
+
+	l_1 = []
+	l_2 = []
+	for count, d in enumerate(d_1_sorted):
+		id = d[0]
+		val = d[1]
+
+		l_1.append(val)
+		l_2.append(d_2[id])
+
+		if count == cutoff:
+			#print(count)
+			break
+
+	tau, p_value = stats.kendalltau(l_1, l_2)
+	return tau, p_value
