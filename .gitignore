@@ -5,4 +5,5 @@
 **/LFR-benchmark/gen*
 .idea/inspectionProfiles/
 .idea/
+.idea/*
 *.pyc
