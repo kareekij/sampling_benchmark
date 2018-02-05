@@ -3,7 +3,7 @@
 **/draw
 **/LFR-benchmark/gen
 **/LFR-benchmark/gen*
-.idea/inspectionProfiles/
-.idea/
-.idea/*
-*.pyc
+
+.idea/**
+**.pyc
+
