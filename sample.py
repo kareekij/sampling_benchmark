@@ -139,7 +139,20 @@ class UndirectedSingleLayer(object):
 		degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
 		top_20 = int(.2 * len(degree_observed_sorted))
 		sel = random.choice(degree_observed_sorted[top_20:])
-		current_node = sel[0]
+		node = sel[0]
+		deg = sel[1]
+		current_node = node
+		# while deg == 1:
+		# 	print('		Expansion', deg)
+		# 	r = random.uniform(0,1)
+		# 	if r < 0.15:
+		# 		break
+		# 	sel = random.choice(degree_observed_sorted[top_20:])
+		# 	node = sel[0]
+		# 	deg = sel[1]
+		#
+		# print('		Get Expansion node! obs: {} from {}'.format(deg, len(degree_observed_sorted[top_20:])))
+		# current_node = node
 
 		return current_node
 
@@ -995,20 +1008,13 @@ class UndirectedSingleLayer(object):
 			avg_deg = np.median(np.array(deg_close))
 			sd_deg = np.std(np.array(deg_close))
 
-			#######
-			#if int(self._cost) % self._log_interval == 0 and self._cost >= 10:
-				# if len(self._sel_act_deg) > 10:
-				# 	k = int(len(self._sel_act_deg) / 2)
-				# else:
-			#k = int(.20 * len(self._sel_act_deg))
-			# if k == 0:
-			# 	k = len(self._sel_act_deg)
-			k = len(self._sel_act_deg)
-			tau, p_value = _mylib.get_rank_correlation(self._sel_act_deg, self._sel_obs_deg, k=k)
-			self._deg_correlation.append(tau)
-			self._p_value.append(p_value)
 
-			score_den = self._scoreDen_test(sub_sample, avg_deg, nodes,current_node_obs_deg,score_den)
+			#k = len(self._sel_act_deg)
+			#tau, p_value = _mylib.get_rank_correlation(self._sel_act_deg, self._sel_obs_deg, k=k)
+			#self._deg_correlation.append(tau)
+			#self._p_value.append(p_value)
+
+			score_den, deg_new = self._scoreDen_test(sub_sample, avg_deg, nodes,current_node_obs_deg,score_den)
 			score_exp = self._scoreExp(sub_sample, avg_deg, nodes, current_node_obs_deg, score_exp)
 
 			#score_exp = self._scoreExp(sub_sample, score_exp)
@@ -1018,6 +1024,15 @@ class UndirectedSingleLayer(object):
 			self._score_exp_list.append(score_exp)
 
 			self._densi_count += 1
+
+			# ### For checking
+			# deg_ori = self._query._graph.degree(den_nodes)
+			# deg_ori_sort = _mylib.sortDictByValues(deg_ori, reverse=True)
+			# best = deg_ori_sort[0][1]
+			# best_nodes = deg_ori_sort[0][0]
+			# best_obs = self._sample_graph.degree(best_nodes)
+			# ### For checking
+
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current)
@@ -1031,16 +1046,21 @@ class UndirectedSingleLayer(object):
 
 			# TODO: just a dummy statement for MOD method
 			#T = self._score_den_threshold * math.exp(-(0.05 * self._exp_count))
-			T = 0.
+			#T = 0.
 			# c_nodes = set(sub_sample['nodes']['close'])
 			# deg = self._sample_graph.degree(list(c_nodes))
 			# mean_deg = np.average(np.array(deg.values()))
 			# sd_deg = np.std(np.array(deg.values()))
 			# T = mean_deg + sd_deg
 
-			nn_mean = np.mean(np.array(self._new_nodes))
-			print('{}:{} weight {} \t score_den: {}	\t score_exp: {} \t cost: {} \t exp:{} \t obs:{} act:{} | {}/{}'.format(self._densi_count, self._exp_count, self._wt_den, round(score_den,2),
-																																  round(score_exp,2), self._cost, round(self._expected_avg_deg, 0), current_node_obs_deg, len(nodes),
+			#nn_mean = np.mean(np.array(self._new_nodes))
+
+			c_nodes.add(current)
+			deg_c = self._sample_graph.degree(list(c_nodes)).values()
+			avg_deg_c = np.average(np.array(deg_c))
+
+			print('{}:{} weight {} \t score_den: {}	\t score_exp: {} \t cost: {} \t exp.deg:{} \t cur.deg:{} \t obs:{} act:{} new: {} | {}/{}'.format(self._densi_count, self._exp_count, self._wt_den, round(score_den,2),
+																																  round(score_exp,2), self._cost, round(self._expected_avg_deg, 0), round(avg_deg_c,0),current_node_obs_deg, len(nodes), deg_new,
 																															  len(den_nodes), len(list(sub_sample['nodes']['open'])) ))
 			#score_exp = 0
 			#if score_den <= T:
@@ -1281,8 +1301,8 @@ class UndirectedSingleLayer(object):
 
 		bound = int(.20*self._expected_avg_deg)
 
-		#if deg_obs > (self._expected_avg_deg-bound):
-		if deg_obs > avg_true_deg:
+		if deg_obs >= (self._expected_avg_deg):
+
 			self._wt_den = self._wt_den + self._wt_increment
 
 		# if lower_b < deg_obs and deg_obs < upper_b:
@@ -1300,7 +1320,7 @@ class UndirectedSingleLayer(object):
 		else:
 			s = self._wt_den * score
 
-		return s
+		return s, deg_new_nodes
 
 	def _scoreDen(self, sub_sample, nodes=None, prev=0):
 		"""
@@ -1491,7 +1511,67 @@ class UndirectedSingleLayer(object):
 		# Updat the sample with the sub sample
 		self._updateSample(sub_sample)
 
-	def _after_bfs(self):
+	def _smooth_init(self):
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		current_node = starting_node
+
+		sub_sample['nodes']['open'].add(current_node)
+
+		sample_nodes = set()
+		rank = 0
+		deg_observed = 0
+
+		while self._cost < self._bfs_count:
+			closed_nodes = sub_sample['nodes']['close']
+			nodes, edges, c = self._query.neighbors(current_node)
+
+			if current_node not in closed_nodes:
+				# For tracking
+				self._count_new_nodes(nodes, current_node, rank, deg_observed)
+
+				# Add edges to sub_graph
+				for e in edges:
+					self._sample_graph.add_edge(e[0], e[1])
+
+				# Update the cost
+				self._increment_cost(c)
+				#
+				# Update the sub sample
+				sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
+
+			next_node = random.choice(list(nodes))
+			next_node_deg = self._sample_graph.degree(next_node)
+
+			a = (next_node_deg / len(nodes))
+			prob = min(1, a)
+			pp = random.uniform(0, 1)
+
+			if pp < prob:
+				current_node = next_node
+				deg_observed = self._sample_graph.degree(current_node)
+
+			if self._cost > 0:
+				sample_nodes.add(current_node)
+
+		# Updat the sample with the sub sample
+		self._updateSample(sub_sample)
+
+		degree_sampled = self._sample_graph.degree(sample_nodes)
+		print('Sampled nodes', len(sample_nodes))
+
+		a = 0.
+		b = 0.
+		c = 0
+		for node, deg in degree_sampled.iteritems():
+			a += deg / (deg + c)
+			b += 1 / (deg + c)
+		self._expected_avg_deg = a/b
+		print(' Expected Avg. Deg', self._expected_avg_deg )
+
+
+
+
+	def _after_init(self):
 		true_g = self._query._graph
 		act_deg = true_g.degree()
 		act_min_deg = min(act_deg.values())
@@ -1507,10 +1587,9 @@ class UndirectedSingleLayer(object):
 		max_deg = max(deg.values())
 		avg = np.average(np.array(deg.values()))
 		med = np.median(np.array(deg.values()))
-		self._expected_avg_deg = med
-		#
-		# print('	Obs: max {} min {} avg {} med {}'.format(max_deg, min_deg, avg, med))
-		# print('	Act: max {} min {}'.format(act_max_deg, act_min_deg))
+		#self._expected_avg_deg = med
+
+
 
 		deg_open = current_g.degree(open_nodes)
 		s_deg = _mylib.sortDictByValues(deg_open, reverse=True)
@@ -1523,6 +1602,7 @@ class UndirectedSingleLayer(object):
 		print(p_bfs_budget, average_deg, self._expected_avg_deg, avg)
 		line = [p_bfs_budget, self._bfs_count, average_deg, med, avg]
 
+		#self._expected_avg_deg = average_deg
 		# with open('./log/bfs-sample-'+dataset+'.csv', "a") as csv_file:
 		# 	writer = csv.writer(csv_file, delimiter=',')
 		# 	writer.writerow(line)
@@ -2200,8 +2280,7 @@ class UndirectedSingleLayer(object):
 		for k, v in obs_deg.iteritems():
 			cc = nx.clustering(graph, k)
 			try:
-				#score_d[k] = ((v - min_val) / (max_val - min_val)) * (1 - cc)
-				score_d[k] = ((v - min_val) / (max_val - min_val))
+				score_d[k] = ((v - min_val) / (max_val - min_val)) * (1 - cc)
 			except ZeroDivisionError:
 				score_d[k] = v
 
@@ -2902,12 +2981,6 @@ class UndirectedSingleLayer(object):
 		return avg_rank / len(candidates)
 
 
-
-
-
-
-
-
 	def generate(self):
 			"""
 			The main method that calls all the other methods
@@ -2916,8 +2989,10 @@ class UndirectedSingleLayer(object):
 			current_list = []
 
 			if self._exp_type == 'exp-den' and self._bfs_count != 0:
-				self._bfs_init()
-				self._after_bfs()
+				#self._bfs_init()
+				self._smooth_init()
+
+				self._after_init()
 
 			# Sample until budget runs out or thero are no more open nodes
 			while self._cost < self._budget:
@@ -2936,7 +3011,6 @@ class UndirectedSingleLayer(object):
 					elif self._exp_type == 'random-exp':
 						current = self._expansion_random(self._sample['nodes']['open'])
 					elif self._exp_type == 'exp-den':
-						print('		Start Expansion ..')
 						current = self._expansion_random(self._sample['nodes']['open'])
 						#current = self._expansion_cheat(self._sample['nodes']['open'])
 				else:
@@ -3008,8 +3082,8 @@ def Logging(sample):
 
 def SaveToFile(results_nodes,results_edges, query_order, rank_order):
 	log.save_to_file(log_file_node, results_nodes)
-	#log.save_to_file(log_file_edge, results_edges)
-	#log.save_to_file(log_file_order, query_order)
+	log.save_to_file(log_file_edge, results_edges)
+	log.save_to_file(log_file_order, query_order)
 	#log.save_to_file(log_file_rank, rank_order)
 
 
@@ -3046,6 +3120,7 @@ if __name__ == '__main__':
 	parser.add_argument('-task', help='Type of sampling', default='undirected_single')
 	parser.add_argument('fname', help='Edgelist file', type=str)
 	parser.add_argument('-budget', help='Total budget', type=int, default=0)
+	parser.add_argument('-percent_b', help='percent budget', type=int, default=0.1)
 	parser.add_argument('-bfs_budget', help='Bfs budget', type=int, default=5)
 	parser.add_argument('-p_bfs_budget', help='Percent Bfs budget', type=float, default=.015)
 	parser.add_argument('-dataset', help='Name of the dataset', default=None)
@@ -3074,10 +3149,11 @@ if __name__ == '__main__':
 	mode = args.mode
 	delimeter = args.delimiter
 	debug = args.debug
+	P_BUDGET = args.percent_b
 
 	if mode == 1:
 		#exp_list = ['med','mod','rw','exp-den']
-		exp_list = ['med','mod','rw','exp-den']
+		exp_list = ['med','mod','rw', 'bfs', 'exp-den']
 	elif mode == 2:
 		exp_list = ['mod','rw','exp-den']
 	elif mode == 3:
@@ -3106,18 +3182,24 @@ if __name__ == '__main__':
 		query = query.UndirectedSingleLayer(graph)
 		#oracle = oracle.Oracle(graph, dataset)
 
-		log_file_node = log_file + dataset + '_n.txt'
-		log_file_edge = log_file + dataset + '_e.txt'
-		log_file_order = log_file + dataset + '_order.txt'
-		log_file_rank = log_file + dataset + '_rank.txt'
+		if mode != 3:
+			log_file_node = log_file + dataset + '_n.txt'
+			log_file_edge = log_file + dataset + '_e.txt'
+			log_file_order = log_file + dataset + '_order.txt'
+			log_file_rank = log_file + dataset + '_rank.txt'
+		else:
+			log_file_node = log_file + dataset + 'exp_n.txt'
+			log_file_edge = log_file + dataset + 'exp_e.txt'
+			log_file_order = log_file + dataset + 'exp_order.txt'
+			log_file_rank = log_file + dataset + 'exp_rank.txt'
 
 		n = graph.number_of_nodes()
 
 		if budget == 0:
-			budget = int(.10*n)
+			budget = int(P_BUDGET*n)
 
 		bfs_budget = int(p_bfs_budget*n)
-		bfs_budget = 0
+
 
 		print('** {} Budget set to {} and {} BFS, n={}'.format(dataset, budget, bfs_budget, n))
 

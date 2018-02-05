@@ -8,11 +8,17 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import collections
-import networkx2gt
-from graph_tool.all import *
+
+
 import random
 import pickle
 import scipy.stats as stats
+
+try:
+    import networkx2gt
+    from graph_tool.all import *
+except ImportError:
+    pass
 
 def logToFileCSV(data,filename,isAppend=False):
     if isAppend: mode = 'a'

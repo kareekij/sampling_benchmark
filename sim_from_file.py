@@ -75,7 +75,7 @@ if __name__ == '__main__':
 		dataset = f
 
 	Log_result = {}
-	fn = './log/exp1-real/' + dataset + '_order.txt'
+	fn = './log-socfb/' + dataset + '_order.txt'
 
 	print(dataset, fn)
 
