@@ -156,224 +156,6 @@ class UndirectedSingleLayer(object):
 
 		return current_node
 
-	def _expansion(self, candidate_list):
-		count = 1
-		DECAY_R = 0.005
-		GROWTH_R = 0.01
-		node_unobs_count = {}
-		node_unobs = {}
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		#sub_sample['nodes']['open'].add(current_node)
-
-		while self._cost < self._budget:
-			####
-			closed_nodes = list(self._sample['nodes']['close'])
-			open_nodes = list(self._sample['nodes']['open'])
-
-			degree_closed = self._sample_graph.degree(closed_nodes)
-			degree_open = self._sample_graph.degree(open_nodes)
-			degree_seq = sorted(degree_closed.values())
-			####
-
-			current_node = random.choice(open_nodes)
-
-			if current_node not in sub_sample['nodes']['open']:
-				sub_sample['nodes']['open'].add(current_node)
-
-
-			# Make a query
-			nodes, edges, c = self._query.neighbors(current_node)
-			current_node_true_deg = len(nodes)
-			self._count_new_nodes(nodes, current_node, deg_obs=degree_open[current_node])
-
-			###
-			percent_tile = stats.percentileofscore(degree_seq, current_node_true_deg)
-
-			obs_nodes = self._sample_graph.nodes()
-			new_nodes = set(nodes) - set(obs_nodes)
-			node_unobs_count[current_node] = len(new_nodes)
-			node_unobs[current_node] = new_nodes
-			self._new_nodes.append(len(new_nodes))
-			####
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-
-			# Update the cost
-			self._increment_cost(c)
-
-			print('			Percentile {} {}'.format(percent_tile, self._percentile))
-			if percent_tile >= self._percentile:
-				self._percentile = self._percentile * math.pow((1 + GROWTH_R), count)
-				break
-
-			self._percentile = self._percentile*math.pow((1-DECAY_R), count)
-
-
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-		obs_nodes = self._sample_graph.nodes()
-		final_list = {}
-		max_val = 0
-		max_node = node_unobs.keys()[0]
-		candidates = set()
-		for n in node_unobs.keys():
-			nbs = self._sample_graph.neighbors(n)
-			open_n = set(nbs) - set(obs_nodes)
-			open_count = len(open_n)
-
-			if open_count >= max_val:
-				max_node = n
-				max_val = open_count
-				candidates = list(open_n)
-
-		if len(candidates) == 0:
-			print(' - No candidate, pick open nodes instead ! -')
-			candidates = list(self._sample['nodes']['open'])
-
-		return random.choice(candidates)
-
-
-
-
-		# print('Check .. closed: {}	open: {} cost: {}'.format(len(self._sample['nodes']['close']), len(self._sample['nodes']['open']), self._cost))
-		#
-		# # Pick new direction for densification
-		# obs_nodes = self._sample_graph.nodes()
-		# closed_nodes = set(self._sample['nodes']['close'])
-		# closed_candidates = node_unobs_count.keys()
-		# best_node, idx = _mylib.get_max_values_from_dict(node_unobs_count, closed_candidates)
-		#
-		# neighbors_unobs = node_unobs[best_node]
-		#
-		# # Pick one from the open nodes
-		# candidates = neighbors_unobs - closed_nodes
-		#
-		# while len(candidates) == 0:
-		# 	print('  -- no candidates from this node, pick from any open nodes')
-		# 	print(closed_candidates)
-		# 	closed_candidates.remove(best_node)
-		#
-		# 	print('Remove {}, remaining size {}'.format(best_node, len(closed_candidates)))
-		#
-		# 	if len(closed_candidates) == 0:
-		# 		candidates = list(self._sample['nodes']['open'])
-		# 		print('bbbb', len(candidates))
-		# 		break
-		# 	else:
-		# 		best_node, idx = _mylib.get_max_values_from_dict(node_unobs_count, closed_candidates)
-		# 		#sorted_x = sorted(node_unobs_count.items(), key=operator.itemgetter(1), reverse=True)
-		# 		#best_node = sorted_x[0][0]
-		#
-		# 		neighbors_unobs = node_unobs[best_node]
-		# 		candidates = neighbors_unobs - closed_nodes
-		#
-		# 		print('Best node', best_node)
-		#
-		# #print(' -- # best unobs {} - candidate {} / {}'.format(best_node_unobs, len(candidates), len(neighbors_unobs) ))
-		# print('before return ', len(candidates))
-		# return random.choice(list(candidates))
-
-
-
-	def _sample_open_node(self, candidate_list):
-		count = 1
-		DECAY_R = 0.005
-		GROWTH_R = 0.01
-		node_unobs_count = {}
-		node_unobs = {}
-		while self._cost < self._budget:
-
-			degree = self._sample_graph.degree(self._sample['nodes']['close'])
-			degree_seq = sorted(degree.values())
-
-			sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-			open_nodes = list(self._sample['nodes']['open'])
-
-			node = random.choice(open_nodes)
-			sub_sample['nodes']['open'].add(node)
-			# Make a query
-			nodes, edges, c2 = self._query.neighbors(node)
-
-			obs_nodes = set(self._sample['nodes']['open']).union(set(self._sample['nodes']['close']))
-			unobs_nodes = nodes - obs_nodes
-
-			# TODO:
-			self._new_nodes.append(len(unobs_nodes))
-
-			node_deg = len(nodes)
-			percent_tile = stats.percentileofscore(degree_seq, node_deg)
-			node_unobs_count[node] = len(unobs_nodes)
-			node_unobs[node] = unobs_nodes
-			#percent_tile = stats.percentileofscore(self._den_unobs, len(unobs_nodes))
-
-			print('	  {}	Percentile {}/{} -- deg {}/{}'.format( len(open_nodes), percent_tile,self._percentile, len(unobs_nodes), node_deg ))
-
-			self._increment_cost(c2)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, node)
-			self._updateSample(sub_sample)
-
-			if percent_tile > self._percentile:
-				self._percentile = self._percentile * math.pow((1 + GROWTH_R), count)
-				break
-			else:
-				self._percentile = self._percentile*math.pow((1-DECAY_R), count)
-				#count += 1
-
-		obs_nodes = set(self._sample['nodes']['open']).union(set(self._sample['nodes']['close']))
-
-		node_unobs_sort = _mylib.sortDictByValues(node_unobs_count, reverse=True)
-		best_node = node_unobs_sort[0][0]
-		best_node_unobs = node_unobs_sort[0][1]
-		# Already query, not neccessary to increment cost
-		neighbors_unobs = node_unobs[best_node]
-		# Pick one from the open nodes
-		candidates = neighbors_unobs - set(self._sample['nodes']['close'])
-
-		if len(candidates) == 0:
-			print('  -- no candidates from this node, pick from any open nodes')
-			candidates = self._sample['nodes']['open']
-
-		print(' -- # best unobs {} - candidate {} / {}'.format(best_node_unobs, len(candidates), len(neighbors_unobs) ))
-		# unobs = nodes.difference(obs_nodes)
-		# if len(unobs) == 0:
-		# 	unobs = nodes.intersection(self._sample['nodes']['open'])
-		# 	print('		-- none --', len(unobs), len(nodes) )
-		# 	if len(unobs) == 0:
-		# 		unobs = self._sample['nodes']['open']
-
-		return random.choice(list(candidates))
-
-	def _sample_open_node_bak(self, candidate_list):
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		open_nodes = self._sample['nodes']['open']
-
-		# deg_1 = self._sample_graph.degree(self._sample['nodes']['close'])
-		# deg_2 = self._sample_graph.degree()
-		# _mylib.degreeHist_2([deg_1.values(), deg_2.values()], save=True, legend=['close', 'all'])
-
-		# Randomly pick some fraction of open nodes
-		k = int((self._k / 100.) * len(open_nodes))
-		open_nodes_sample = random.sample(open_nodes, k)
-
-		self._tmp = len(open_nodes_sample)
-		print(' -- Pick nodes {} / {} actual: {}'.format(k, len(open_nodes), len(open_nodes_sample)))
-
-		# Find the best node with max unobseved degree
-		best_node = self._query_max_unobs(open_nodes_sample)
-
-		return best_node
-
 	def _query_max_unobs(self, candidate_list):
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
@@ -439,129 +221,6 @@ class UndirectedSingleLayer(object):
 
 		return ret
 
-	def _expansion_hubs_multi_nb(self, candidate_list, sample_g=None):
-		if sample_g is None:
-			sample_g = nx.Graph()
-			sample_g.add_edges_from(self._sample['edges'])
-			print(" * ", sample_g.number_of_edges())
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		# Graph with 1-deg nodes removed.
-		sample_G_induced = _mylib.remove_node_with_deg(sample_g)
-		partition = community.best_partition(sample_G_induced)
-		mod = community.modularity(partition, sample_G_induced)
-		cc_all = nx.clustering(sample_G_induced)
-
-		# TODO: check these two
-		#nodes_candidate = self._get_hubs_neighbors_as_candidate(partition, sample_G_induced, sample_g)
-		nodes_candidate = set(sample_G_induced.nodes()).intersection(set(self._sample['nodes']['open']))
-		cc = nx.clustering(sample_g, nodes_candidate)
-		cc_g = _mylib.remove_one_values(cc)
-
-		if len(cc_g) == 0:
-			print('	No zero cc - full list {} {}'.format(len(cc), len(nodes_candidate)))
-			cc_g = cc
-
-		# TODO: value of k should be well-picked
-		#k = int(.5 * (len(cc_g)))
-		k = 50
-		final_list = self._pick_nodes(cc_g, sample_G_induced, partition,k=k)
-		if len(final_list) == 0:
-			final_list = cc_g
-		print('	Candidate List ', len(final_list))
-		best_node = self._estimate_from_cheaper_layer(final_list, sample_g, sample_G_induced, partition)
-
-		return best_node
-
-	def _make_all_queries(self, candidate_list, sample_g, sample_G_induced, partition):
-		if len(candidate_list) == 1:
-			return candidate_list[0]
-
-		best_unobs_count = 0
-		best_node = None
-		for node in candidate_list:
-			# Query the neighbors of current
-			nodes, edges, c2 = self._query.neighbors(node)
-
-
-			self._increment_cost(c2)
-			#self._cost += c2
-
-			unobs_nodes_count = len(set(nodes) - set(sample_g.nodes()))
-
-			if unobs_nodes_count > best_unobs_count:
-				best_node = node
-				best_unobs_count = unobs_nodes_count
-
-		# If there is no best node found
-		if best_node == None:
-			best_node = random.choice(candidate_list)
-
-		#print(' Completed {} '.format(best_unobs_count))
-		return best_node
-
-	def _estimate_from_cheaper_layer(self, candidate_list, sample_g, sample_G_induced, partition):
-		if len(candidate_list) == 1:
-			return candidate_list[0]
-		elif len(candidate_list) == 0:
-			return random.choice(list(self._sample['nodes']['open']))
-
-		unobs_nodes_count_list = {}
-		score_list = {}
-		sum_cost = 0.0
-		for node in candidate_list:
-			nodes, edges, c2 = self._query_cheap.neighbors(node)
-
-			self._increment_cost(c2)
-
-			sum_cost += c2
-
-			obs_nodes = sample_g.nodes()
-
-			if len(nodes) != 0:
-				unobs_nodes_count = len(set(nodes) - set(obs_nodes))
-				unobs_nodes_count_list[node] = unobs_nodes_count
-				p_nodes = sample_G_induced.neighbors(node)
-				intersect = set(nodes).intersection(set(p_nodes))
-				#score_list[node] = len(intersect) / len(nodes)
-				if len(intersect) == 0:
-					score_list[node] = 0
-
-				#print(score_list[node], unobs_nodes_count)
-
-
-				# obs = len( set(nodes).intersection(set(obs_nodes)) )
-				#
-				# score =  1.* obs / len(nodes)
-				# print(obs, score)
-				#
-				# score_list[node] = score
-
-		#print(score_list)
-		#best_node =  _mylib.sortDictByValues(score_list)[0][0]
-
-
-
-		if len(unobs_nodes_count_list) == 0:
-			print('		Bad luck >< .. list is empty')
-			return random.choice(candidate_list)
-
-		# zero_m = score_list.keys()
-		# val_zero = [unobs_nodes_count_list[x] for x in zero_m]
-		# max_val = max(val_zero)
-		# l = _mylib.get_members_from_com(max_val, unobs_nodes_count_list)
-		# ll = list(set(zero_m).intersection(l))
-		# best_node = random.choice(ll)
-
-		max_val = max(unobs_nodes_count_list.values())
-		l = _mylib.get_members_from_com(max_val,unobs_nodes_count_list)
-		best_node = random.choice(l)
-
-
-		print(' Cost spent in cheaper layer = {} -- Unobs: {} ^ {}'.format(sum_cost, max_val, len(l)))
-
-		return best_node
-
 	def _pick_nodes(self, d, graph, partition,k=5):
 		ret = []
 
@@ -579,226 +238,6 @@ class UndirectedSingleLayer(object):
 
 		ret = [t[0] for t in score[:k]]
 		return ret
-
-	def _pick_nodes2(self, d, graph, partition, k=5):
-		ret = []
-
-		score = {}
-		for n in d.keys():
-			nbs = graph.neighbors(n)
-			p_set = set()
-
-			for nb in nbs:
-				p = partition[nb]
-				p_set.add(p)
-			score[n] = 1. * len(p_set) / len(partition.values())
-
-		score = _mylib.sortDictByValues(score, reverse=True)
-
-		ret = [t[0] for t in score[:k]]
-
-		return ret
-
-	def _expansion_hub(self,candidate_list, sample_g=None):
-		if sample_g is None:
-			print('Random - expansion')
-			return self._expansion_random(candidate_list)
-
-		# Graph with 1-deg nodes removed.
-		sample_G_induced = _mylib.remove_node_with_deg(sample_g)
-		partition = community.best_partition(sample_G_induced)
-		mod = community.modularity(partition, sample_G_induced)
-
-
-		candidates = self._get_hubs_as_candidate(partition, sample_G_induced, sample_g)
-
-		close_nodes = self._sample['nodes']['close']
-		t = set(candidates) - close_nodes
-
-	def _get_hubs_as_candidate(self,partition,sample_G_induced,sample_g):
-		candidate = []
-		for p in set(partition.values()):
-			members = _mylib.get_members_from_com(p, partition)
-			# Construct community graph - com_graph
-			com_graph = sample_G_induced.subgraph(members)
-
-			# TODO: Centrality or degree, should consider only particular community
-			deg_com = nx.degree_centrality(com_graph)
-			# deg_com = com_graph.degree(members)
-
-			# Pick 10% of nodes that has the highest degree in the graph
-			k_percent = self._k / 100.
-			K_HUBS = int(k_percent * len(members))
-			print("Hubs {} - {}".format(p,K_HUBS))
-			deg_com = _mylib.sortDictByValues(deg_com, reverse=True)
-			top_k_deg = [seq[0] for seq in deg_com[:K_HUBS]]
-			candidate += top_k_deg
-
-
-		return candidate
-
-	def _get_dispersion_candidate_from_partition(self, partition,sample_G_induced,sample_g,return_min=True):
-		dispersion_candidate = []
-
-		p_degree = []
-		for p in set(partition.values()):
-			members = _mylib.get_members_from_com(p, partition)
-
-			# Construct community graph - `com_graph`
-			com_graph = sample_G_induced.subgraph(members)
-
-			# TODO: Centrality or degree, should consider only particular community
-			deg_com = nx.degree_centrality(com_graph)
-
-
-			# Pick 10% of nodes that has the highest degree in the graph
-			k_percent = self._k / 100.
-			K_HUBS = int(k_percent*len(members))
-
-			if K_HUBS == 0:
-				K_HUBS = 1
-			print('	{} is picked {} hubs'.format(p, K_HUBS))
-
-			deg_com = _mylib.sortDictByValues(deg_com, reverse=True)
-			top_k_deg = [seq[0] for seq in deg_com[:K_HUBS]]
-
-			for hub in top_k_deg:
-				nb = sample_G_induced.neighbors(hub)
-				nb_t = self._sample['nodes']['close'] - set(nb)
-				#print(nb)
-				ego_g = nx.ego_graph(sample_G_induced, hub)
-				ego_g.remove_nodes_from(nb_t)
-
-				#_mylib.draw_com(ego_g, ego_g.degree())
-
-				# Calculate dispersion starting from a selected node
-				dispersion = nx.dispersion(sample_G_induced, hub)
-
-				# Remove all closed nodes
-				dispersion = _mylib.remove_entries_from_dict(self._sample['nodes']['close'], dispersion)
-				dispersion = _mylib.sortDictByValues(dispersion, reverse=True)
-
-				if return_min:
-					dispersion_candidate += dispersion
-				elif not return_min and len(dispersion) != 0:
-					dispersion_candidate.append(dispersion[0])
-
-
-
-		# return zero dispersion if return_min=True
-		if return_min:
-			non_zero_l, dispersion_candidate = _mylib.remove_zero_values(dispersion_candidate)
-			print('	[Disp] Filter out - {} {}'.format(len(non_zero_l), len(dispersion_candidate) ))
-
-		return _mylib.sort_tuple_list(dispersion_candidate)
-
-	def _get_dispersion_candidate(self, partition, sample_G_induced, sample_g, return_min=True):
-		deg_cen = nx.degree_centrality(sample_G_induced)
-		deg_cen = _mylib.sortDictByValues(deg_cen, reverse=True)
-
-		nodes_count = sample_G_induced.number_of_nodes()
-
-		k_percent = self._k / 100.
-		K_HUBS = int(k_percent * len(members))
-		top_k_cen = deg_cen[:K_HUBS]
-
-		dispersion_candidate = []
-		for hub in top_k_cen:
-
-			# Calculate dispersion starting from a selected node
-			dispersion = nx.dispersion(sample_G_induced, hub[0])
-			# Remove all closed nodes from the list
-			dispersion = _mylib.remove_entries_from_dict(self._sample['nodes']['close'], dispersion)
-			dispersion = _mylib.sortDictByValues(dispersion, reverse=True)
-			dispersion_candidate += dispersion
-
-			if return_min:
-				dispersion_candidate += dispersion
-			elif not return_min and len(dispersion) != 0:
-				dispersion_candidate.append(dispersion[0])
-
-		# return zero dispersion if return_min=True
-		if return_min:
-			non_zero_l, dispersion_candidate = _mylib.remove_zero_values(dispersion_candidate)
-
-
-		return _mylib.sort_tuple_list(dispersion_candidate)
-
-	def _get_hubs_neighbors_as_candidate(self, partition, sample_G_induced, sample_g, return_min=True):
-		dispersion_candidate = []
-
-		open_node = set()
-		for p in set(partition.values()):
-			members = _mylib.get_members_from_com(p, partition)
-
-			# Construct community graph - `com_graph`
-			com_graph = sample_G_induced.subgraph(members)
-			# TODO: Centrality or degree, should consider only particular community
-			deg_com = nx.degree_centrality(com_graph)
-
-			# Pick 10% of nodes that has the highest degree in the graph
-			k_percent = self._k / 100.
-			K_HUBS = int(k_percent * len(members))
-
-			if K_HUBS == 0:
-				K_HUBS = 1
-			#print('	Com: {} is picked {} hubs'.format(p, K_HUBS))
-
-			deg_com = _mylib.sortDictByValues(deg_com, reverse=True)
-			top_k_deg = [seq[0] for seq in deg_com[:K_HUBS]]
-
-			for hub in top_k_deg:
-				nb = sample_G_induced.neighbors(hub)
-				open_nb = set(nb).difference(self._sample['nodes']['close'])
-				#print('		# open nodes {} / {} '.format(len(open_nb), len(nb)))
-
-				open_node.update(open_nb)
-
-		return list(open_node)
-
-	def _oracle_max_unobs_neigbors(self, candidate_list, sample_g):
-		best_node, c = self._oracle.get_max_unobs_nodes(candidate_list, sample_g.nodes())
-
-		self._increment_cost(c)
-		#if self._isCost:
-			#self._cost += c
-
-
-		# cc = nx.clustering(self._oracle.graph, nodes_candidate)
-		# cc_sorted = _mylib.sortDictByValues(cc,reverse=True)
-		#
-		# node_freq = {}
-		# for node_t in candidate_list:
-		# 	node = node_t[0]
-		# 	node_freq[node] = node_freq.get(node,0) + 1
-		#
-		# for node_t in cc_sorted:
-		# 	node = node_t[0]
-		# 	node_cc = node_t[1]
-		#
-		# 	if node == best_node:
-		# 		print('{} {} *'.format(node_cc, node_freq[node]))
-		# 	else:
-		# 		print('{} {} '.format(node_cc, node_freq[node]))
-
-
-
-		# best_count = 0
-		# best_node = None
-		# for node_t in nodes_track:
-		# 	node = node_t[0]
-		# 	freq = node_t[1]
-		#
-		# 	# Assume we ask the Oracle about number of unobserved degree of nodes.
-		# 	nodes, edges, c2 = self._query.neighbors(node)
-		# 	# Focus on the unobserved NODE instead of unobserved DEGREE
-		# 	unobserved_nodes_count = len(set(nodes) - set(sample_g.nodes()))
-		#
-		# 	if unobserved_nodes_count > best_count or best_count == 0:
-		# 		best_count = unobserved_nodes_count
-		# 		best_node = node
-
-		return best_node
 
 	def _expansion_oracle(self, candidate_list):
 		"""
@@ -819,33 +258,6 @@ class UndirectedSingleLayer(object):
 		#center_node = nx.center(sample_g_in)[0]
 		#current, c = self._oracle.expansion(candidate_list, obs_nodes, center_node)
 		current, c = self._oracle.expansion(candidate_list, obs_nodes, "")
-
-		self._increment_cost(c)
-
-		return current
-
-	def _expansion_cheat(self, candidate_list):
-		current_sample = self._sample_graph
-
-		true_deg = self._query._graph.degree(candidate_list)
-		sorted_deg = _mylib.sortDictByValues(true_deg,reverse=True)
-
-		current = sorted_deg[0][0]
-
-
-		return current
-
-	def _expansion_old(self, candidate_list):
-		"""
-		Run the expansion step
-
-		Args:
-			candidate_list (list[str]) -- List of expansion candidates
-		Return:
-			str -- The id of the node to perform densification on
-		"""
-		current, c = self._oracle.expansion_old(candidate_list, \
-											list(self._sample['nodes']['close'].union(self._sample['nodes']['open'])))
 
 		self._increment_cost(c)
 
@@ -1074,72 +486,6 @@ class UndirectedSingleLayer(object):
 		# Reset weights
 		# starting_w_den = self._wt_den
 		# starting_w_exp = self._wt_exp
-
-		# Return list of potential expansion nodes
-		return self._getExpNodes()
-
-	def _densification_max_score(self, candidate):
-		"""
-		Run the densification steps
-
-		Args:
-			candidate (str) -- The id of the node to start densification on
-		Return:
-			list[str] -- List of candidate nodes for expansion
-		"""
-		current_node = candidate
-
-		# If the candidate is not in the sample, add it
-		if candidate not in self._sample_graph.nodes():
-			self._sample_graph.add_node(candidate)
-
-		# Initialize a new sub sample
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(candidate)
-
-		# Initialize densification and expansion scores
-		# score_den = self._scoreDen(sub_sample)
-		score_den = self._scoreDen_test(sub_sample)
-
-		prev_score = score_den
-
-		print('Start Den - ', candidate)
-		# TODO: Densification switch criteria
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-			current_node_obs_deg = self._sample_graph.degree(current_node)
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-
-
-			# Update the densification and expansion scores
-			score_den = self._scoreDen_test(sub_sample, nodes, current_node_obs_deg, score_den)
-
-			print('Current node', current_node)
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-
-			# Update the cost
-			self._increment_cost(c)
-
-			# TODO: just a dummy statement for MOD method
-			if score_den < 0.1:
-				break
-
-			print('[max-score] score_den: {}'.format(score_den))
-
-			# Candidate nodes are the (open) neighbors of current node
-			candidates = list(
-				set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-
-			current_node = self._cal_score(candidates)
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
 
 		# Return list of potential expansion nodes
 		return self._getExpNodes()
@@ -1568,9 +914,6 @@ class UndirectedSingleLayer(object):
 		self._expected_avg_deg = a/b
 		print(' Expected Avg. Deg', self._expected_avg_deg )
 
-
-
-
 	def _after_init(self):
 		true_g = self._query._graph
 		act_deg = true_g.degree()
@@ -1601,13 +944,6 @@ class UndirectedSingleLayer(object):
 		#print('	Weight set to {} \t Max deg open {}'.format(self._wt_den, max_deg_open))
 		print(p_bfs_budget, average_deg, self._expected_avg_deg, avg)
 		line = [p_bfs_budget, self._bfs_count, average_deg, med, avg]
-
-		#self._expected_avg_deg = average_deg
-		# with open('./log/bfs-sample-'+dataset+'.csv', "a") as csv_file:
-		# 	writer = csv.writer(csv_file, delimiter=',')
-		# 	writer.writerow(line)
-
-		#self._budget = 0
 
 	def _bfs(self):
 
@@ -1853,32 +1189,6 @@ class UndirectedSingleLayer(object):
 			if cash_count_sorted[index][0] in candidates:
 				c = cash_count_sorted[index][0]
 				return c
-
-
-
-
-	def _pr_graph_tool(self):
-		gt_graph = networkx2gt.nx2gt(self._sample_graph)
-		pr = graph_tool.centrality.pagerank(gt_graph)
-
-		max_node = candidates[0]
-		max_val = 0
-		for cand in candidates:
-			val = pr[gt_graph.vertex(int(cand))]
-			if val > max_val:
-				max_node = cand
-
-		return max_node
-
-
-
-	def _get_arms_members_more_than(self, bandit, k=10):
-		candidates = []
-		for key, members in bandit['arms'].iteritems():
-			mem_count = len(members)
-			if mem_count > k:
-				candidates.append(key)
-		return candidates
 
 	def _update_score(self, bandit, iter_count, CONSTANT_P = 150):
 
@@ -2225,46 +1535,6 @@ class UndirectedSingleLayer(object):
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 
-	def _max_avg_nbs(self):
-		current_node = starting_node
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		rank = 0
-		deg_obs = 0
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-
-			close_n = sub_sample['nodes']['close']
-
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-			self._count_new_nodes(nodes, current_node, rank, deg_obs)
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-
-			self._increment_cost(c)
-
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-
-			# Node Selection
-			current_node, deg_obs = self._node_selection(candidates)
-
-			# current_node = degree_observed_sorted[0][0]
-			# deg_obs = degree_observed_sorted[0][1]
-
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
 	def _node_selection(self, candidates):
 		graph = self._sample_graph
 
@@ -2290,30 +1560,6 @@ class UndirectedSingleLayer(object):
 		selected_node = sorted_list[0][0]
 		deg_node = obs_deg[selected_node]
 		sel_deg = self._query._graph.degree(selected_node)
-
-		return selected_node, deg_node
-
-	def _node_selection_test(self, candidates, c_nodes, o_nodes):
-
-		graph = self._sample_graph
-		obs_deg = graph.degree(candidates)
-
-		min_val = min(obs_deg.values())
-		max_val = max(obs_deg.values())
-		score_d = dict()
-
-		top_k_nodes = []
-		p_members = dict()
-		#current_p = community.best_partition(graph)
-		for k,v in obs_deg.iteritems():
-			cc = nx.clustering(graph, k)
-			#global_score = self._nbs_score(k, c_nodes, o_nodes, current_p)
-			try:
-				score_d[k] = (((v - min_val) / (max_val - min_val)) * (1 - cc))
-			except ZeroDivisionError:
-				score_d[k] = (v) * (1 - cc)
-
-		deg_node = obs_deg[selected_node]
 
 		return selected_node, deg_node
 
@@ -2419,64 +1665,6 @@ class UndirectedSingleLayer(object):
 
 		return selected_node, deg_node, selected_arm
 
-	def _nbs_score(self, node, closed_nodes, open_nodes, p):
-
-		com_id = p[node]
-		nbs = self._sample_graph.neighbors(node)
-
-		com_count = dict()
-		for n in nbs:
-			id = p[n]
-			com_count[id] = com_count.get(id,0) + 1
-
-		sorted_count = _mylib.sortDictByValues(com_count,reverse=True)
-		max_com = sorted_count[0][0]
-
-		return com_count[com_id] / len(nbs)
-		#print('**', com_id, max_com)
-		# if com_id != max_com:
-		# 	return 1
-		# else:
-		# 	return 0
-
-	def _max_score(self):
-		candidates = self._sample['nodes']['open']
-
-		current_node = starting_node
-
-		# End
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-
-			self._increment_cost(c)
-
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
-					self._sample['nodes']['close']))
-
-			current_node = self._pick_from_close(candidates)
-			#current_node = self._cal_score(candidates)
-			#score_sorted = _mylib.sortDictByValues(score, reverse=True)
-
-			#current_node = score_sorted[0][0]
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
 	def _pick_from_close(self, candidates):
 		close_nodes = set(self._sample_graph.nodes()) - set(candidates)
 		deg = self._sample_graph.degree(close_nodes)
@@ -2541,95 +1729,6 @@ class UndirectedSingleLayer(object):
 		print(' max-score pick:', score[node])
 		return node
 
-	def _learn_model(self):
-		candidates = self._sample['nodes']['open']
-		degree_observed = self._sample_graph.degree(candidates)
-		degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-		current_node = degree_observed_sorted[0][0]
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-			self._get_training(sub_sample, nodes, edges, current_node)
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-
-			self._increment_cost(c)
-
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
-					self._sample['nodes']['close']))
-			# Start picking a new node to query
-			if self._cost <= 50:
-				degree_observed = self._sample_graph.degree(candidates)
-				degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-				current_node = degree_observed_sorted[0][0]
-			else:
-				y = np.array(self._Y)
-				#cut_off = np.median(self._sample_graph.degree(sub_sample['nodes']['close']).values())
-				# cut_off = np.mean(y)
-				#cut_off = 0.1
-
-				#y[np.array(self._Y) >= cut_off] = 1
-				#y[np.array(self._Y) < cut_off] = 0
-
-
-				model = self._build_model(y)
-				testing = self._get_testing(candidates)
-
-				#print(np.shape(self._X))
-				print(np.shape(np.array(testing)))
-
-
-				#candidates = random.sample(candidates,5)
-				#candidates_deg = self._sample_graph.degree(candidates)
-				#candidates_cc = nx.clustering(self._sample_graph,candidates)
-
-				#A = np.array([candidates_deg.values(), candidates_cc.values()]).transpose()
-				#print(len(candidates))
-				#print(A)
-
-				y_predict = model.predict(testing)
-				# print(y_predict)
-				#
-				max_val = (max(y_predict))
-				print('max val', max_val)
-				y_idx = np.where(y_predict == max_val)[0]
-
-				#
-				#
-				# # y_idx = np.nonzero(y_predict)[0]
-				# #
-				if len(y_idx) != 0:
-					pick = random.choice(y_idx)
-					#print('pick index', pick, len(candidates))
-					current_node = list(candidates)[pick]
-				# else:
-				# 	print('all zeros')
-				# 	current_node = random.choice(candidates)
-
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
-	def _build_model(self, y):
-		np_X = np.array(self._X)
-
-		logistic = linear_model.LogisticRegression()
-		logistic.fit(np_X, y)
-
-		return logistic
-
 	def _neighbor_score(self, candidates, close_nodes):
 		score = dict()
 		cand_score = dict()
@@ -2646,125 +1745,6 @@ class UndirectedSingleLayer(object):
 			cand_score[n] = np.mean(np.array(s))
 
 		return cand_score
-
-	def _hybrid(self):
-		current_node = starting_node
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		is_MOD = True
-		new_nodes_step = []
-
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-			# For tracking
-			self._count_new_nodes(nodes, current_node)
-
-			# New nodes found
-			new_nodes = set(nodes).difference(set(self._sample_graph.nodes()))
-			new_nodes_step.append(len(new_nodes))
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-			self._increment_cost(c)
-
-			if len(new_nodes_step) % self._WINDOW_SIZE == 0:
-				is_MOD = self._decision_making(new_nodes_step)
-
-			# TODO: Need some criteria to switch between MOD and RW !
-			if is_MOD:
-				#print(' -- MOD {} neighbors {} new nodes'.format(len(nodes), len(new_nodes)))
-				closed_nodes = set(sub_sample['nodes']['close']).union(set(self._sample['nodes']['close']))
-				open_nodes = set(self._sample_graph.nodes()).difference(closed_nodes)
-
-				deg = self._sample_graph.degree(open_nodes)
-				deg_sorted =  _mylib.sortDictByValues(deg,reverse=True)
-
-				current_node = deg_sorted[0][0]
-			else:
-				if len(new_nodes_step) % 10 == 0:
-					if self._track_hyb_samp[-2] != -1:
-						closed_nodes = set(sub_sample['nodes']['close']).union(set(self._sample['nodes']['close']))
-						current_node = random.choice(list(closed_nodes))
-						# Query the neighbors of current
-						nodes, edges, c = self._query.neighbors(current_node)
-						# Candidate nodes are the (open) neighbors of current node
-						new_nodes = list(
-							set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-
-
-				candidates = new_nodes
-				while len(candidates) == 0:
-					current_node = random.choice(list(nodes))
-					# Query the neighbors of current
-					nodes, edges, c = self._query.neighbors(current_node)
-					# Candidate nodes are the (open) neighbors of current node
-					candidates = list(
-						set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
-					#print(' ---- Walking.. {} neighbors'.format(len(nodes)))
-
-				current_node = random.choice(list(candidates))
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
-	def _decision_making(self, steps):
-		D = 0.15
-		WINDOW_SIZE = self._WINDOW_SIZE
-		curr_window = np.array(steps[-WINDOW_SIZE:])
-		prev_window = np.array(steps[-(2*WINDOW_SIZE):-WINDOW_SIZE])
-		t = len(steps)
-
-		curr_window_sum = np.sum(curr_window)
-		prev_window_sum = np.sum(prev_window)
-
-		self._track_hyb_samp_nn.append(curr_window_sum)
-		self._track_hyb_samp.append(self._SAMP)
-
-		if t == self._WINDOW_SIZE:
-			self._PREV = (curr_window_sum)
-			self._track_hyb_samp_threshold.append(0)
-			return True
-
-		#THRESHOLD = math.log((self._PREV * math.pow((1 - D), (t / WINDOW_SIZE))))
-		exponent = (t/WINDOW_SIZE)
-		THRESHOLD = int(self._PREV * math.exp(-exponent/200))
-
-		self._track_hyb_samp_threshold.append(THRESHOLD)
-		self._PREV = np.mean(np.array(self._track_hyb_samp_nn[:-1] ))#THRESHOLD #curr_window_sum
-
-		if curr_window_sum < THRESHOLD:
-			self._SAMP = self._SAMP * -1
-
-
-		if self._SAMP == -1:
-			print(' RW! sum {} .. threshold {}'.format(curr_window_sum, THRESHOLD))
-			return False
-		elif self._SAMP == 1:
-			print(' MOD! sum {} .. threshold {}'.format(curr_window_sum, THRESHOLD))
-			return True
-
-	def _get_max_open_nbs_node(self, close_n):
-
-		count_n = {}
-		for n in close_n:
-			nodes = self._sample_graph.neighbors(n)
-			candidates = list(set(nodes).difference(close_n))
-			count_n[n] = len(candidates)
-
-		max_count = max(count_n.values())
-		print('Max count', max_count)
-
-		candidates = _mylib.get_members_from_com(max_count, count_n)
-		return random.choice(candidates)
 
 	def _getDenNodes(self, nodes):
 		graph = self._sample_graph
@@ -2813,30 +1793,6 @@ class UndirectedSingleLayer(object):
 		else:
 			print('	*No open nodes')
 			return list(nodes)
-
-	def _track_cost_spent_return(self):
-		cur_return = len(self._sample['nodes']['close']) + len(self._sample['nodes']['open'])
-
-		if len(self._cost_spent) == 0:
-			prev_cost = 0
-			prev_return = 0
-		else:
-			prev_cost = self._cost_spent[-1]
-			prev_return = self._nodes_return[-1]
-
-		cost_used = self._cost - prev_cost
-		cost_used = self._cost - prev_cost
-		node_gain = cur_return - prev_return
-
-		self._nodes_return.append(node_gain)
-		self._cost_spent.append(cost_used)
-
-		#self._nodes_return.append(cur_return - prev_return)
-
-		# self._cost_spent.append(self._cost - prev_cost)
-
-		#self._cost_spent.append([self._stage, self._cost, cur_return])
-		#self._nodes_return.append(cur_return)
 
 	def _increment_cost(self, cost ):
 		self._cost += cost
@@ -2901,57 +1857,6 @@ class UndirectedSingleLayer(object):
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
 
-
-	def _k_rank(self):
-		current_node = starting_node
-
-		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
-		sub_sample['nodes']['open'].add(current_node)
-		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
-
-		rank=0
-		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
-
-			close_n = sub_sample['nodes']['close']
-
-			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
-			self._count_new_nodes(nodes, current_node, rank)
-
-
-			# Update the sub sample
-			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
-
-			# Add edges to sub_graph
-			for e in edges:
-				self._sample_graph.add_edge(e[0], e[1])
-			# Update the cost
-
-			self._increment_cost(c)
-
-			candidates = set(sub_sample['nodes']['open'])
-
-			degree_true = self._query._graph.degree(candidates)
-			degree_observed = self._sample_graph.degree(candidates)
-
-			degree_excess = Counter(degree_true)
-			degree_excess.subtract(Counter(degree_observed))
-
-			degree_excess_sorted = _mylib.sortDictByValues(degree_excess, reverse=True)
-
-			cutoff = int(len(degree_excess_sorted) * 0.1)
-			if cutoff > 2:
-				current_node = random.choice(degree_excess_sorted[:cutoff])[0]
-			else:
-				current_node = degree_excess_sorted[0][0]
-
-			rank = self._get_node_rank_from_excess_degree(current_node, candidates)
-
-
-
-		# Update the sample with the sub sample
-		self._updateSample(sub_sample)
-
 	def _get_node_excess_degree(self, candidates):
 		degree_true = self._query._graph.degree(candidates)
 		degree_observed = self._sample_graph.degree(candidates)
@@ -2960,26 +1865,6 @@ class UndirectedSingleLayer(object):
 		degree_excess.subtract(Counter(degree_observed))
 
 		return degree_excess
-
-	def _get_node_rank_from_excess_degree(self, selected_node, candidates):
-		degree_excess = self._get_node_excess_degree(candidates)
-		degree_excess_val = np.array(degree_excess.values())
-		degree_excess_val[::-1].sort()
-
-		selected_ex_deg = degree_excess[selected_node]
-
-		ranks = np.where(degree_excess_val == selected_ex_deg)[0]
-		avg_rank = np.mean(ranks)
-
-		min = degree_excess_val.min()
-		max = degree_excess_val.max()
-		mean = np.mean(degree_excess_val)
-
-
-		print('Min {}, Max {}, Avg. {}'.format(min, max, mean))
-
-		return avg_rank / len(candidates)
-
 
 	def generate(self):
 			"""
@@ -3018,6 +1903,7 @@ class UndirectedSingleLayer(object):
 
 				# Perform densification
 				self._stage = 'den'
+
 				if self._exp_type == 'random':
 					self.random_sampling()
 				elif self._exp_type == 'rw':
@@ -3026,8 +1912,6 @@ class UndirectedSingleLayer(object):
 					self._max_obs_deg()
 				elif self._exp_type == 'med':
 					self._max_excess_deg()
-				elif self._exp_type == 'max-score':
-					self._max_score()
 				elif self._exp_type == 'oracle':
 					current_list = self._densification_oracle(current)
 				elif self._exp_type == 'sb':
@@ -3040,12 +1924,8 @@ class UndirectedSingleLayer(object):
 					self._bandit()
 				elif self._exp_type == 'cash':
 					self._cash_spread()
-				elif self._exp_type == 'k-rank':
-					self._k_rank()
 				elif self._exp_type == 'exp-den':
 					current_list = self._densification(current)
-				elif self._exp_type == 'man':
-					self._max_avg_nbs()
 
 
 				#self._densi_count += 1
@@ -3102,18 +1982,6 @@ def Append_Log(sample, type):
 
 
 	return cost_track
-
-def Append_Log_Hybrid(sample, trial):
-	a = len(sample._track_hyb_samp)
-	trial_l = [trial] * int(a)
-	windows = [x for x in xrange(1,int(a)+1)]
-
-	#if len(Log_result_hyb) == 0:
-	Log_result_hyb['mode'] = Log_result_hyb.get('mode',[]) + sample._track_hyb_samp
-	Log_result_hyb['new_nodes'] = Log_result_hyb.get('new_nodes', []) + sample._track_hyb_samp_nn
-	Log_result_hyb['trial'] = Log_result_hyb.get('trial', []) + trial_l
-	Log_result_hyb['window'] = Log_result_hyb.get('window', []) + windows
-	Log_result_hyb['threshold'] = Log_result_hyb.get('threshold', []) + sample._track_hyb_samp_threshold
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
@@ -3232,8 +2100,6 @@ if __name__ == '__main__':
 
 			cost_arr = Append_Log(sample, type)
 
-			if type == 'hybrid':
-				Append_Log_Hybrid(sample, i)
 
 		Log_result['budget'] = Log_result.get('budget', list()) + cost_arr
 		Log_result_edges['budget'] = Log_result_edges.get('budget', list()) + cost_arr
