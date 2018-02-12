@@ -7,5 +7,5 @@ for file in "${search_dir}/"*_order.txt ; do
     target_file="$(basename "${file}")"
     filename=$(echo $target_file| cut -d'_' -f 1)
     echo "Executing.. "$filename
-    python calculate_properties_step_syn.py $filename
+    #python calculate_properties_step_syn.py $filename
 done

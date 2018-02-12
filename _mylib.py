@@ -510,16 +510,13 @@ def read_mtx_file(fname):
     for i, line in enumerate(file.readlines()):
         s = (line[0])
         if s == "%":
-            print(line)
             continue
         line = str.replace(line, '\n', '')
         line = str.replace(line, ',', ' ')
         tmp = line.split(' ')[:2]
-        #print(tmp)
 
         edges_list.append(tuple(tmp))
 
-    #print(edges_list)
     return edges_list
 
 def read_file(fname):
@@ -534,7 +531,13 @@ def read_file(fname):
         G = pickle.load(open(fname, 'rb'))
     else:
         G = nx.read_edgelist(fname)
-    return G
+
+    # Select giant component and remove all self-loop edges
+    graph = max(nx.connected_component_subgraphs(G), key=len)
+    selfloop_edges = graph.selfloop_edges()
+    graph.remove_edges_from(selfloop_edges)
+
+    return graph
 
 def get_keys_by_value(d, target_val=0):
     keys = np.array(d.keys())

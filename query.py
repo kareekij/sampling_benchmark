@@ -15,10 +15,12 @@ class UndirectedSingleLayer(object):
 	"""
 	Class to simulate API queries for undirected single layer graphs
 	"""
-	def __init__(self, graph, cost=1):
+	def __init__(self, graph, cost=1, deg_cost=0.1, nodes_limit=0):
 		super(UndirectedSingleLayer, self).__init__()
 		self._graph = graph 				# The complete graph
 		self._cost_neighbor = cost 			# Cost of each query (default: 1)
+		self._cost_num_neighbor = deg_cost		# Cost if query degree
+		self._nodes_limit = nodes_limit		# The number of neighbors that the API can returns
 
 	def neighbors(self, node):
 		"""
@@ -30,9 +32,20 @@ class UndirectedSingleLayer(object):
 			list[str] -- List of node ids which are neighbors of node
 		"""
 		nodes = self._graph.neighbors(node)
-		edges = [(node, n) for n in nodes]
 
-		return set(nodes), set(edges), self._cost_neighbor
+		if self._nodes_limit !=0 and len(nodes) > self._nodes_limit:
+			return_nodes = random.sample(list(nodes), self._nodes_limit)
+		else:
+			return_nodes = nodes
+
+		edges = [(node, n) for n in return_nodes]
+
+		return set(return_nodes), set(edges), self._cost_neighbor
+
+	def number_of_neighbors(self, nodes):
+		deg = self._graph.degree(nodes)
+		cost = self._cost_num_neighbor * len(deg.keys())
+		return deg, cost
 
 	def randomNode(self):
 		"""

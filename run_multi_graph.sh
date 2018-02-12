@@ -17,11 +17,12 @@ while [ $counter -le 10 ]
 do
 
 
-  file_name="./LFR-benchmark/gen/${dataset}/$counter/network.dat"
+  file_name="./data-syn/${dataset}/$counter/network.dat"
   #file_name="./data/${dataset}/$counter/network.dat"
   #file_name="./data/${dataset}/$counter/network.dat"
   echo "Running $file_name"
-  python sample.py $file_name -dataset $dataset -budget $budget -experiment 1
+  #python sample.py $file_name -dataset $dataset -budget $budget -experiment 1
+  python sample_page.py $file_name -dataset $dataset -budget $budget -experiment 1
 
   ((counter++))
 done
