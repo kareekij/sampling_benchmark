@@ -2021,7 +2021,7 @@ if __name__ == '__main__':
 
 	if mode == 1:
 		#exp_list = ['med','mod','rw','exp-den']
-		exp_list = ['med','mod','rw', 'bfs', 'exp-den']
+		exp_list = ['med', 'mod','rw', 'bfs']
 	elif mode == 2:
 		exp_list = ['mod','rw','exp-den']
 	elif mode == 3:

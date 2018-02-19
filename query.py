@@ -10,6 +10,7 @@ import _mylib
 import pickle
 import community
 import os
+import math
 
 class UndirectedSingleLayer(object):
 	"""
@@ -22,7 +23,7 @@ class UndirectedSingleLayer(object):
 		self._cost_num_neighbor = deg_cost		# Cost if query degree
 		self._nodes_limit = nodes_limit		# The number of neighbors that the API can returns
 
-	def neighbors(self, node):
+	def neighbors(self, node, isPage=False, pageNo=0):
 		"""
 		Return the neighbors of a node
 
@@ -31,16 +32,45 @@ class UndirectedSingleLayer(object):
 		Return:
 			list[str] -- List of node ids which are neighbors of node
 		"""
-		nodes = self._graph.neighbors(node)
+		nodes = list(self._graph.neighbors(node))
+		is_lastPage = False
+		# Case 1: Complete or Partial scenarios
+		if not isPage:
+			# Case 1.1: Parital, return k nodes randomly (returned node can be duplicated)
+			if self._nodes_limit !=0 and len(nodes) > self._nodes_limit:
+				return_nodes = random.sample(list(nodes), self._nodes_limit)
+			# Case 1.2: Complete, return all nodes
+			else:
+				return_nodes = nodes
 
-		if self._nodes_limit !=0 and len(nodes) > self._nodes_limit:
-			return_nodes = random.sample(list(nodes), self._nodes_limit)
+		# Case 2: Paginated scenario
 		else:
-			return_nodes = nodes
+			return_total = len(list(nodes))
+			total_pages = math.ceil(1.*return_total / self._nodes_limit)
 
+			if pageNo > total_pages:
+				print('  Page > Total pages .. check')
+				print('Current Page: {} \t total: {} \t nodes: {}/{}'.format(pageNo, total_pages,
+																		 return_total, self._nodes_limit))
+				return set(), set(), 0
+			start_idx = pageNo * self._nodes_limit
+			end_idx =  (pageNo * self._nodes_limit) + self._nodes_limit
+
+			if end_idx > len(nodes):
+				end_idx = len(nodes) - 1
+
+			return_nodes = nodes[start_idx: end_idx]
+
+			if start_idx == end_idx:
+				return_nodes = nodes[-1]
+
+			if pageNo == (total_pages-1):
+				is_lastPage = True
+
+		# get all edges
 		edges = [(node, n) for n in return_nodes]
 
-		return set(return_nodes), set(edges), self._cost_neighbor
+		return set(return_nodes), set(edges), self._cost_neighbor, is_lastPage
 
 	def number_of_neighbors(self, nodes):
 		deg = self._graph.degree(nodes)
@@ -57,7 +87,8 @@ class UndirectedSingleLayer(object):
 			str -- The node id of a random node in the graph
 		"""
 		nodes = self._graph.nodes()
-		return random.choice(nodes)
+
+		return random.choice(list(nodes))
 
 	def randomHighDegreeNode(self):
 		degree = self._graph.degree()
