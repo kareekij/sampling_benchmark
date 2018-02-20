@@ -7,7 +7,7 @@ Three networks properties are considered, 1) Modularity 2) Average degree and 3)
 * networkx
 * numpy
 * scipy
-* Create folder `log` within this folder
+* Create folder `log` within this folder (Optional)
 
 ## 9 popular algorithms are implemented
 * Breadth-first Search Sampling
@@ -22,4 +22,4 @@ Three networks properties are considered, 1) Modularity 2) Average degree and 3)
 
 
 ### How to run
-`python sample.py <path_to_file> -b <budget> -experiment <number_of_experiments>`
+`python sample.py <path_to_file> -b <budget> -experiment <number_of_experiments> -log <log_folder>`
