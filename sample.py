@@ -142,17 +142,6 @@ class UndirectedSingleLayer(object):
 		node = sel[0]
 		deg = sel[1]
 		current_node = node
-		# while deg == 1:
-		# 	print('		Expansion', deg)
-		# 	r = random.uniform(0,1)
-		# 	if r < 0.15:
-		# 		break
-		# 	sel = random.choice(degree_observed_sorted[top_20:])
-		# 	node = sel[0]
-		# 	deg = sel[1]
-		#
-		# print('		Get Expansion node! obs: {} from {}'.format(deg, len(degree_observed_sorted[top_20:])))
-		# current_node = node
 
 		return current_node
 
