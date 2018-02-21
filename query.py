@@ -48,24 +48,32 @@ class UndirectedSingleLayer(object):
 			return_total = len(list(nodes))
 			total_pages = math.ceil(1.*return_total / self._nodes_limit)
 
+			#print('='*10)
+			#print(' [Query] {} \t Degree {} \t Page: {} \t Curpage: {}'.format(node, return_total, total_pages, pageNo))
+
 			if pageNo > total_pages:
 				print('  Page > Total pages .. check')
-				print('Current Page: {} \t total: {} \t nodes: {}/{}'.format(pageNo, total_pages,
+				print('{} Current Page: {} \t total: {} \t nodes: {}/{}'.format(node, pageNo, total_pages,
 																		 return_total, self._nodes_limit))
 				return set(), set(), 0
 			start_idx = pageNo * self._nodes_limit
 			end_idx =  (pageNo * self._nodes_limit) + self._nodes_limit
 
-			if end_idx > len(nodes):
-				end_idx = len(nodes) - 1
+
+			# If number of returned items is less than window size.
+			if end_idx <= self._nodes_limit:
+				end_idx = len(nodes)
 
 			return_nodes = nodes[start_idx: end_idx]
 
+			# If one item left
 			if start_idx == end_idx:
-				return_nodes = nodes[-1]
+				return_nodes = [nodes[-1]]
 
 			if pageNo == (total_pages-1):
 				is_lastPage = True
+
+			#print(' [Query] {} start: {} \t end: {} \t return: {}'.format(node, start_idx, end_idx, len(return_nodes)))
 
 		# get all edges
 		edges = [(node, n) for n in return_nodes]
