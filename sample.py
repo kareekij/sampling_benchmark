@@ -394,7 +394,7 @@ class UndirectedSingleLayer(object):
 				current_node_obs_deg = degree_observed[current]
 
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current)
+			nodes, edges, c, _ = self._query.neighbors(current)
 			self._count_new_nodes(nodes, current, deg_obs=current_node_obs_deg, score=score_den)
 
 			# All neighbors that are not closed
@@ -496,7 +496,7 @@ class UndirectedSingleLayer(object):
 			current = random.choice(list(den_nodes))
 
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current)
+			nodes, edges, c, _ = self._query.neighbors(current)
 			self._count_new_nodes(nodes, current)
 
 
@@ -823,7 +823,7 @@ class UndirectedSingleLayer(object):
 			current = queue[0]
 
 			# Get the neighbors - nodes and edges; and cost associated
-			nodes, edges, c = self._query.neighbors(current)
+			nodes, edges, c, _ = self._query.neighbors(current)
 			self._count_new_nodes(nodes, current)
 
 			self._increment_cost(c)
@@ -858,7 +858,7 @@ class UndirectedSingleLayer(object):
 
 		while self._cost < self._bfs_count:
 			closed_nodes = sub_sample['nodes']['close']
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 
 			if current_node not in closed_nodes:
 				# For tracking
@@ -958,7 +958,7 @@ class UndirectedSingleLayer(object):
 			current = queue[0]
 
 			# Get the neighbors - nodes and edges; and cost associated
-			nodes, edges, c = self._query.neighbors(current)
+			nodes, edges, c, _ = self._query.neighbors(current)
 			self._count_new_nodes(nodes, current)
 
 			self._increment_cost(c)
@@ -1001,7 +1001,7 @@ class UndirectedSingleLayer(object):
 			current = queue[0]
 
 			# Get the neighbors - nodes and edges; and cost associated
-			nodes, edges, c = self._query.neighbors(current)
+			nodes, edges, c, _ = self._query.neighbors(current)
 			self._increment_cost(c)
 
 			self._count_new_nodes(nodes, current)
@@ -1036,7 +1036,7 @@ class UndirectedSingleLayer(object):
 		deg_observed=0
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			# For tracking
 			self._count_new_nodes(nodes, current_node, rank,deg_observed)
 
@@ -1055,7 +1055,7 @@ class UndirectedSingleLayer(object):
 			while len(candidates) == 0:
 				current_node = random.choice(list(nodes))
 				# Query the neighbors of current
-				nodes, edges, c = self._query.neighbors(current_node)
+				nodes, edges, c, _ = self._query.neighbors(current_node)
 				# Candidate nodes are the (open) neighbors of current node
 				candidates = list(set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 				print(' Walking.. {} neighbors'.format(len(nodes)))
@@ -1130,7 +1130,7 @@ class UndirectedSingleLayer(object):
 
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 			# Query on the selected node
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			new_nodes = set(nodes) - set(self._sample_graph.nodes())
 			closed_nodes = self._sample['nodes']['close'] | sub_sample['nodes']['close']
 
@@ -1356,7 +1356,7 @@ class UndirectedSingleLayer(object):
 
 		while self._cost < START_BUDGET and len(sub_sample['nodes']['open']) > 0:
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			# For tracking
 			self._count_new_nodes(nodes, current_node)
 
@@ -1379,7 +1379,7 @@ class UndirectedSingleLayer(object):
 			while len(candidates) == 0:
 				current_node = random.choice(list(nodes))
 				# Query the neighbors of current
-				nodes, edges, c = self._query.neighbors(current_node)
+				nodes, edges, c, _ = self._query.neighbors(current_node)
 				# Candidate nodes are the (open) neighbors of current node
 				candidates = list(
 					set(nodes).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
@@ -1401,16 +1401,29 @@ class UndirectedSingleLayer(object):
 
 		cash_count = {}
 
+		C = dict()
+		H = dict()
+		G = 0
+		P = dict()
+
 		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
 
 			close_n = sub_sample['nodes']['close']
 
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node)
 
-			for c_n in nodes:
-				cash_count[c_n] = cash_count.get(c_n, 1) + (1 / len(nodes))
+			cost_of_current = C.get(current_node, 1.)
+			H[current_node] = H.get(current_node, 0.) + cost_of_current
+
+			G += cost_of_current
+			for nb in nodes:
+				C[nb] = C.get(nb, 1.) + (cost_of_current / len(nodes))
+				P[nb] = (H.get(nb, 0.) + C.get(nb, 1.)) / (G + 1)
+
+			P[current_node] = 1. * (H.get(current_node, 0) + C.get(current_node, 1)) / (G + 1)
+			C[current_node] = 0.
 
 			# Update the sub sample
 			sub_sample = self._updateSubSample(sub_sample, nodes, edges, current_node)
@@ -1422,19 +1435,20 @@ class UndirectedSingleLayer(object):
 
 			self._increment_cost(c)
 
+			closed_node = sub_sample['nodes']['close']
 
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(
-					self._sample['nodes']['close']))
+			# P_open = _mylib.remove_entries_from_dict(closed_node, P)
+			# max_p = max(P_open.values())
+            #
+			# nodes_with_max_p = [k for k, v in P_open.iteritems() if v == max_p]
+			# print('node with max p ', len(nodes_with_max_p), len(P), len(P_open))
+			# current_node = random.choice(nodes_with_max_p)
+			P_open = _mylib.remove_entries_from_dict(closed_node, C)
+			max_p = max(P_open.values())
 
-			#degree_observed = self._sample_graph.degree(candidates)
-			cash_count_sorted = _mylib.sortDictByValues(cash_count, reverse=True)
-
-
-			for index,ccc in enumerate(cash_count_sorted):
-				if cash_count_sorted[index][0] in candidates:
-					current_node = cash_count_sorted[index][0]
-					break
+			nodes_with_max_p = [k for k, v in P_open.iteritems() if v == max_p]
+			print('node with max p ', len(nodes_with_max_p), len(P), len(P_open))
+			current_node = random.choice(nodes_with_max_p)
 
 
 
@@ -1455,7 +1469,7 @@ class UndirectedSingleLayer(object):
 			close_n = sub_sample['nodes']['close']
 
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node, rank, deg_obs)
 
 			# Update the sub sample
@@ -1808,6 +1822,7 @@ class UndirectedSingleLayer(object):
 
 	def _max_excess_deg(self):
 		current_node = starting_node
+		print(current_node)
 
 		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
 		sub_sample['nodes']['open'].add(current_node)
@@ -1819,7 +1834,7 @@ class UndirectedSingleLayer(object):
 			close_n = sub_sample['nodes']['close']
 
 			# Query the neighbors of current
-			nodes, edges, c = self._query.neighbors(current_node)
+			nodes, edges, c, _ = self._query.neighbors(current_node)
 			self._count_new_nodes(nodes, current_node, rank=rank, deg_obs=deg_observed)
 
 
@@ -1911,7 +1926,7 @@ class UndirectedSingleLayer(object):
 					self._hybrid()
 				elif self._exp_type == 'vmab':
 					self._bandit()
-				elif self._exp_type == 'cash':
+				elif self._exp_type == 'opic':
 					self._cash_spread()
 				elif self._exp_type == 'exp-den':
 					current_list = self._densification(current)
@@ -2010,7 +2025,8 @@ if __name__ == '__main__':
 
 	if mode == 1:
 		#exp_list = ['med','mod','rw','exp-den']
-		exp_list = ['med', 'mod','rw', 'bfs']
+		#exp_list = ['med', 'mod','rw', 'bfs']
+		exp_list = ['med', 'mod', 'rw', 'bfs','opic']
 	elif mode == 2:
 		exp_list = ['mod','rw','exp-den']
 	elif mode == 3:
