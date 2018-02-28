@@ -1482,58 +1482,16 @@ class UndirectedSingleLayer(object):
 
 			self._increment_cost(c)
 
-			candidates = list(
-				set(self._sample_graph.nodes()).difference(sub_sample['nodes']['close']).difference(self._sample['nodes']['close']))
 
+			candidates = sub_sample['nodes']['open']
 			degree_observed = self._sample_graph.degree(candidates)
-			degree_true = self._query._graph.degree(candidates)
-			degree_observed_sorted = _mylib.sortDictByValues(degree_observed, reverse=True)
-			degree_true_sorted =  _mylib.sortDictByValues(degree_true, reverse=True)
+			max_observed_degree = max(degree_observed.values())
+			nodes_with_max_deg = [k for k, v in degree_observed.iteritems() if v == max_observed_degree]
 
-			# top_20 = int(.2 * len(degree_observed_sorted))
-			# sel = random.choice(degree_observed_sorted[:top_20])
-			# current_node = sel[0]
-			# deg_obs = sel[1]
-
-			current_node = degree_observed_sorted[0][0]
-			deg_obs = degree_observed_sorted[0][1]
+			current_node = random.choice(nodes_with_max_deg)
+			deg_obs = degree_observed[current]
 
 
-
-			# pr = nx.clustering(self._sample_graph)
-			# cores = nx.core_number(self._sample_graph)
-			# nbs_deg = nx.average_neighbor_degree(self._sample_graph, candidates)
-			#
-			#
-			# #b = [x[1] for x in degree_true_sorted[:10]]
-			# aa = ([x[1] for x in degree_observed_sorted[:15]])
-			# a = ([degree_true[x[0]] for x in degree_observed_sorted[:15]])
-			# b = ([round(pr[x[0]], 2) for x in degree_observed_sorted[:15]])
-			# dd = [nbs_deg[x[0]] for x in degree_observed_sorted[:15] ]
-			#
-			# score = self._neighbor_score(candidates, set(sub_sample['nodes']['close']))
-			#
-			# ee = ([round(score[x[0]], 2) for x in degree_observed_sorted[:15]])
-
-
-
-			# print(deg_obs, degree_true[current_node], '---', max(a))
-			# print('		obs', aa)
-			# print('		tru', a)
-			# print('		ccc', b)
-			# print('		nbs', dd)
-			# print('		pro', ee)
-
-
-
-
-
-
-
-
-			#rank = nx.average_clustering(self._sample_graph, list(sub_sample['nodes']['close']))
-			#print(self._cost, rank)
-			#rank = self._get_node_rank_from_excess_degree(current_node, candidates)
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -2026,7 +1984,7 @@ if __name__ == '__main__':
 	if mode == 1:
 		#exp_list = ['med','mod','rw','exp-den']
 		#exp_list = ['med', 'mod','rw', 'bfs']
-		exp_list = ['med', 'mod', 'rw', 'bfs','opic']
+		exp_list = ['med', 'mod', 'rw', 'bfs', 'sb', 'random', 'opic', 'pagerank']
 	elif mode == 2:
 		exp_list = ['mod','rw','exp-den']
 	elif mode == 3:
@@ -2094,8 +2052,8 @@ if __name__ == '__main__':
 
 			if starting_node == -1:
 				#starting_node = sample._query.randomHighDegreeNode()
-				starting_node = sample._query.randomFromLargeCommunity(graph, dataset)
-
+				#starting_node = sample._query.randomFromLargeCommunity(graph, dataset)
+				starting_node = sample._query.randomNode()
 			#print('[{}] Experiment {} starts at node {}'.format(type, i, starting_node))
 
 

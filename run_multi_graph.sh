@@ -21,7 +21,7 @@ do
   #file_name="./data/${dataset}/$counter/network.dat"
   #file_name="./data/${dataset}/$counter/network.dat"
   echo "Running $file_name"
-  python sample.py $file_name -dataset $dataset -budget $budget -experiment 1
+  python denseEx.py $file_name -dataset $dataset -budget $budget -experiment 1
   #python sample_page.py $file_name -dataset $dataset -budget $budget -experiment 1
 
   ((counter++))

@@ -653,6 +653,7 @@ class UndirectedSingleLayer(object):
 			P[current] = 1. * (H.get(current, 0) + C.get(current, 1)) / (G + 1)
 			C[current] = 0.
 
+			closed_node = sub_sample['nodes']['close']
 
 			P_open = _mylib.remove_entries_from_dict(closed_node, C)
 			max_p = max(P_open.values())
@@ -692,6 +693,39 @@ class UndirectedSingleLayer(object):
 			current = random.choice(nodes_with_max_deg)
 			current_node_deg_obs = degree_observed[current]
 
+
+		# Update the sample with the sub sample
+		self._updateSample(sub_sample)
+
+	def _max_obs_page_rank(self):
+		current = starting_node
+
+		sub_sample = {'edges': set(), 'nodes': {'close': set(), 'open': set()}}
+		sub_sample['nodes']['open'].add(current)
+		sub_sample['nodes']['open'].update(self._sample['nodes']['open'])
+
+		current_node_deg_obs = 0
+
+		while self._cost < self._budget and len(sub_sample['nodes']['open']) > 0:
+			# Query the neighbors of current
+			nodes, edges, c, _ = self._query.neighbors(current)
+			# Update
+			sub_sample = self._updateAfterQuery(nodes, edges, c, current, current_node_deg_obs, sub_sample)
+
+			print('{} #{} cost:{} \t current node: {} \t node coverage: {}'.format(type, i, self._cost, current,
+																				   self._sample_graph.number_of_nodes()))
+
+
+			candidates = sub_sample['nodes']['open']
+			closed_nodes = set(self._sample_graph.nodes()) - candidates
+
+			observed_page_rank = nx.pagerank(self._sample_graph)
+			observed_page_rank_open = _mylib.remove_entries_from_dict(list(closed_nodes), observed_page_rank)
+			max_page_rank = max(observed_page_rank_open.values())
+			nodes_with_max_page_rank = [k for k, v in observed_page_rank_open.iteritems() if v == max_page_rank]
+
+			current = random.choice(nodes_with_max_page_rank)
+			current_node_deg_obs = self._sample_graph.degree()[current]
 
 		# Update the sample with the sub sample
 		self._updateSample(sub_sample)
@@ -829,6 +863,8 @@ class UndirectedSingleLayer(object):
 					self._random_walk()
 				elif self._exp_type == 'mod':
 					self._max_obs_deg()
+				elif self._exp_type == 'pagerank':
+					self._max_obs_page_rank()
 				elif self._exp_type == 'med':
 					self._max_excess_deg()
 				elif self._exp_type == 'oracle':
@@ -919,7 +955,8 @@ if __name__ == '__main__':
 	P_BUDGET = args.percent_b
 
 	if mode == 1:
-		exp_list = ['med','mod','rw','denseEx']
+		exp_list = ['med', 'mod', 'rw', 'bfs', 'sb', 'random', 'opic', 'pagerank']
+		#exp_list = ['med','mod','rw','denseEx']
 	elif mode == 2:
 		exp_list = ['mod','rw','denseEx']
 	elif mode == 3:
