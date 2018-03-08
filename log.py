@@ -121,3 +121,13 @@ def save_to_file_nn(fname, results):
 		txt = str(line).replace('[','')
 		txt = str(txt).replace(']', '')
 		print(txt, file=f)
+
+
+def log_anything(name, results):
+	fname = './log/' + name + '.txt'
+	f = open(fname, 'a')
+	for line in results:
+		txt = str(line).replace('[', '')
+		txt = str(txt).replace(']', '')
+		txt = str(txt).replace('\'', '')
+		print(txt, file=f)

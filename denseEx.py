@@ -148,6 +148,25 @@ class UndirectedSingleLayer(object):
 
 		return current
 
+	def _expansion(self, candidate_list):
+
+		print(' == Expansion : cand: {} == '.format(len(candidate_list)))
+		ecc = nx.eccentricity(self._sample_graph)
+		ecc_of_starting_node = ecc[starting_node]
+
+		closed_nodes = self._sample['nodes']['close']
+		ecc_open = _mylib.remove_entries_from_dict(list(closed_nodes), ecc)
+
+		max_ecc_val = max(ecc_open.values())
+		nodes_with_max_val = [k for k, v in ecc.iteritems() if v == max_ecc_val]
+
+		print(" Max ecc:{} \t start ecc: {} \t {}/{}".format(max_ecc_val, ecc_of_starting_node,
+															 len(nodes_with_max_val), len(candidate_list)))
+		print("="*10)
+		current = random.choice(nodes_with_max_val)
+
+		return current
+
 	def _densification(self, current):
 		"""
 		Run the densification steps
@@ -189,9 +208,9 @@ class UndirectedSingleLayer(object):
 			# Update
 			sub_sample = self._updateAfterQuery(nodes, edges, c, current, current_node_deg_obs, sub_sample)
 
-			print('{} #{} cost:{} \t current node: {} \t| den: {} \t exp:{}|\t cov: {} \t new: {}/{} avg:{}'.format(type, i, self._cost, current,
-																				score_den, score_exp,  self._sample_graph.number_of_nodes(),
-																											   len(new_nodes), len(nodes), self._expected_avg_deg))
+			#print('{} #{} cost:{} \t current node: {} \t| den: {} \t exp:{}|\t cov: {} \t new: {}/{} avg:{}'.format(type, i, self._cost, current,
+																				# score_den, score_exp,  self._sample_graph.number_of_nodes(),
+																				# 							   len(new_nodes), len(nodes), self._expected_avg_deg))
 
 
 			# TODO: Densification score, to be changed.
@@ -302,7 +321,7 @@ class UndirectedSingleLayer(object):
 
 		boundary_nodes = nx.node_boundary(self._sample_graph, sub_sample['nodes']['close'])
 		check = set(sub_sample['nodes']['open']).intersection(set(boundary_nodes))
-		print('check', len(check), len(boundary_nodes) )
+
 
 		# TODO: score function
 		# Calculate the densification score: deg_new / (deg_true - deg_obs)
@@ -849,7 +868,8 @@ class UndirectedSingleLayer(object):
 						current_list = self._getExpNodes()
 						current = self._expansion_oracle(current_list)
 					elif self._exp_type == 'denseEx':
-						current = self._expansion_random(self._sample['nodes']['open'])
+						#current = self._expansion_random(self._sample['nodes']['open'])
+						current = self._expansion(self._sample['nodes']['open'])
 
 				else:
 					current = starting_node
@@ -958,7 +978,7 @@ if __name__ == '__main__':
 		exp_list = ['med', 'mod', 'rw', 'bfs', 'sb', 'random', 'opic', 'pagerank']
 		#exp_list = ['med','mod','rw','denseEx']
 	elif mode == 2:
-		exp_list = ['mod','rw','denseEx']
+		exp_list = ['med', 'mod', 'rw', 'denseEx']
 	elif mode == 3:
 		exp_list = ['denseEx']
 

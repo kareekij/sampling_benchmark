@@ -17,7 +17,8 @@ while [ $counter -le 10 ]
 do
 
 
-  file_name="./data-syn/${dataset}/$counter/network.dat"
+  #file_name="./data-syn/${dataset}/$counter/network.dat"
+  file_name="./data-syn-06/${dataset}/$counter/network.dat"
   #file_name="./data/${dataset}/$counter/network.dat"
   #file_name="./data/${dataset}/$counter/network.dat"
   echo "Running $file_name"

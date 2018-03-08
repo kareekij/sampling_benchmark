@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="349b1696-223a-4689-83f7-e71b11445264" name="Default" comment="del unrelated files">
-      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/sampling_benchmark.iml" afterPath="$PROJECT_DIR$/.idea/sampling_benchmark.iml" />
+    <list default="true" id="349b1696-223a-4689-83f7-e71b11445264" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/run_multi_graph_incomplete.sh" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/run_page_node_limit.sh" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/query.py" afterPath="$PROJECT_DIR$/query.py" />
-      <change beforePath="$PROJECT_DIR$/run_multi_graph_page.sh" afterPath="$PROJECT_DIR$/run_multi_graph_page.sh" />
+      <change beforePath="$PROJECT_DIR$/LFR-benchmark/benchmark" afterPath="$PROJECT_DIR$/LFR-benchmark/benchmark" />
+      <change beforePath="$PROJECT_DIR$/LFR-benchmark/run.sh" afterPath="$PROJECT_DIR$/LFR-benchmark/run.sh" />
+      <change beforePath="$PROJECT_DIR$/denseEx.py" afterPath="$PROJECT_DIR$/denseEx.py" />
+      <change beforePath="$PROJECT_DIR$/log.py" afterPath="$PROJECT_DIR$/log.py" />
+      <change beforePath="$PROJECT_DIR$/run-syn-sample.sh" afterPath="$PROJECT_DIR$/run-syn-sample.sh" />
+      <change beforePath="$PROJECT_DIR$/run-syn-step.sh" afterPath="$PROJECT_DIR$/run-syn-step.sh" />
+      <change beforePath="$PROJECT_DIR$/run_multi_graph.sh" afterPath="$PROJECT_DIR$/run_multi_graph.sh" />
+      <change beforePath="$PROJECT_DIR$/run_multi_graph_page.sh" afterPath="" />
     </list>
     <ignored path="sampling_benchmark.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -55,28 +60,86 @@
     <favorites_list name="sampling_benchmark" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sample_incomp.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sample_incomp.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="2128" column="35" lean-forward="true" selection-start-line="2128" selection-start-column="35" selection-end-line="2128" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.56881464">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="query.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/query.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="300">
+                  <caret line="26" column="11" lean-forward="false" selection-start-line="26" selection-start-column="11" selection-end-line="26" selection-end-column="11" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="denseEx.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/denseEx.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="15255">
+                  <caret line="1044" column="0" lean-forward="false" selection-start-line="1044" selection-start-column="0" selection-end-line="1045" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="sample_incomp.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sample_incomp.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="305">
+                  <caret line="830" column="0" lean-forward="false" selection-start-line="830" selection-start-column="0" selection-end-line="830" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="run_multi_graph_incomplete.sh" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/run_multi_graph_incomplete.sh">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="390">
+                  <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="log.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/log.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1905">
+                  <caret line="129" column="40" lean-forward="false" selection-start-line="129" selection-start-column="40" selection-end-line="129" selection-end-column="40" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="sample_incomp.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sample_incomp.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="646">
+                  <caret line="1101" column="63" lean-forward="false" selection-start-line="1101" selection-start-column="12" selection-end-line="1101" selection-end-column="63" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="run_page_node_limit.sh" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/run_page_node_limit.sh">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="0">
+                  <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="19" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -87,36 +150,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_random</find>
-      <find>random</find>
-      <find>_getNextNodes</find>
-      <find>_cash_spread</find>
+      <find>densification</find>
+      <find>smooth_init</find>
+      <find>_exp</find>
+      <find>scoreden</find>
+      <find>_scoreDen</find>
+      <find>max_obs</find>
+      <find>max_obs_deg</find>
       <find>page_rank</find>
-      <find>page</find>
-      <find>cash</find>
+      <find>print('=</find>
+      <find>node with</find>
       <find>generate</find>
-      <find>_init_bandit_g_rw</find>
-      <find>_bandit</find>
-      <find>def _ba</find>
-      <find>self._updateAfter</find>
-      <find>_page</find>
-      <find>pagera</find>
-      <find>ceil</find>
-      <find>_get_arms</find>
-      <find>remove</find>
-      <find>-th</find>
       <find>pagerank</find>
-      <find>page-</find>
-      <find>sample</find>
-      <find>close</find>
-      <find>_nodes_estimated_degree</find>
-      <find>_bfs</find>
-      <find>updateSub</find>
-      <find>updateAfter</find>
+      <find>opic</find>
+      <find>node</find>
+      <find>cash_spre</find>
+      <find>scoreDen</find>
+      <find>expansion</find>
       <find>estimate</find>
-      <find>After</find>
-      <find>max_exce</find>
-      <find>print('{} {} \t current node: {} page:{} p:{} \t c:{}'.format(type, i, current, self._page_no[current], self._selected_prob[current], self._cost))</find>
+      <find>returned_nodes</find>
+      <find>'</find>
+      <find>_returned_nodes</find>
+      <find>_nodes_estimated_degree</find>
+      <find>true_node_deg</find>
+      <find>_updateSubSample</find>
+      <find>current_selcted_prob =</find>
+      <find>node_selected_prob = self._selected_prob[current]</find>
+      <find>current_selec</find>
+      <find>_selected_prob</find>
+      <find>d_t</find>
+      <find>node_selected_prob</find>
     </findStrings>
     <replaceStrings>
       <replace>,</replace>
@@ -127,6 +190,10 @@
       <replace>_getNextNodes(sub_sample)</replace>
       <replace>print('{} {} \t current node: {} page:{} p:{} \t c:{}'.format(type, i, current, self._page_no[current], self._selected_prob[current], self._cost))</replace>
       <replace>print('{} #{} cost:{} \t current node: {} page:{} \t prob:{} \t'.format(type, i, self._cost, current, self._page_no[current], self._selected_prob[current]))</replace>
+      <replace>nodes, edges, c, _ = self._query.neighbors</replace>
+      <replace>_scoreDen</replace>
+      <replace>current</replace>
+      <replace>node_selected_prob = self._getSelectedProb(current)</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -138,18 +205,13 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/query.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/sample_incomp.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/log.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/denseEx.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/log/grad_edges_order.txt" />
-        <option value="$PROJECT_DIR$/reorder_twitter.py" />
-        <option value="$PROJECT_DIR$/data/twitter/twitter_friends_edges.csv" />
-        <option value="$PROJECT_DIR$/gen_common.py" />
-        <option value="$PROJECT_DIR$/multi-sample.py" />
-        <option value="$PROJECT_DIR$/baselines.py" />
-        <option value="$PROJECT_DIR$/multi_sample.py" />
         <option value="$PROJECT_DIR$/read_sqlite.py" />
         <option value="$PROJECT_DIR$/merge_snapshot.py" />
         <option value="$PROJECT_DIR$/sample_multi.py" />
@@ -180,19 +242,26 @@
         <option value="$PROJECT_DIR$/gen_random_network.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/LFR-benchmark/parameters.dat" />
-        <option value="$PROJECT_DIR$/_mylib.py" />
         <option value="$PROJECT_DIR$/run-syn-step.sh" />
         <option value="$PROJECT_DIR$/run-syn-sample.sh" />
-        <option value="$PROJECT_DIR$/run_multi_graph.sh" />
-        <option value="$PROJECT_DIR$/sample.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/log/ca-GrQc_n.txt" />
         <option value="$PROJECT_DIR$/R_code/plot_node_edge_coverage_syn.R" />
-        <option value="$PROJECT_DIR$/run_multi_graph_page.sh" />
         <option value="$PROJECT_DIR$/sample_page.py" />
-        <option value="$PROJECT_DIR$/run_multi_graph_page_mac.sh" />
         <option value="$PROJECT_DIR$/query.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/_mylib.py" />
+        <option value="$PROJECT_DIR$/run_multi_graph_page_mac.sh" />
+        <option value="$PROJECT_DIR$/sample.py" />
+        <option value="$PROJECT_DIR$/run_multi_graph.sh" />
+        <option value="$PROJECT_DIR$/run_multi_graph_page.sh" />
+        <option value="$PROJECT_DIR$/denseEx.py" />
+        <option value="$PROJECT_DIR$/log.py" />
+        <option value="$PROJECT_DIR$/log/est-deg-1.txt" />
+        <option value="$PROJECT_DIR$/log/est-deg.txt" />
+        <option value="$PROJECT_DIR$/run_page_node_limit.sh" />
+        <option value="$PROJECT_DIR$/run_page_node_limit_mac.sh" />
+        <option value="$PROJECT_DIR$/run_multi_graph_incomplete.sh" />
         <option value="$PROJECT_DIR$/sample_incomp.py" />
       </list>
     </option>
@@ -203,7 +272,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="y" value="22" />
     <option name="width" value="1920" />
     <option name="height" value="1058" />
@@ -239,6 +308,22 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="sampling_benchmark" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sampling_benchmark" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sampling_benchmark" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sampling_benchmark" type="462c0819:PsiDirectoryNode" />
+              <item name="log" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -260,22 +345,11 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="sampling_benchmark" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sampling_benchmark" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
-    <property name="last_opened_file_path" value="$USER_HOME$/venv" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="js.eslint.eslintPackage" value="" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/log/small_sample.py" />
@@ -630,7 +704,7 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="StructureViewFactory">
-    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR" />
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR,SHOW_FIELDS" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -832,7 +906,35 @@
       <option name="project" value="LOCAL" />
       <updated>1519139006815</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="after fix selected prob and modify OPIC, SB, PageRank, rand">
+      <created>1519221722457</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1519221722457</updated>
+    </task>
+    <task id="LOCAL-00029" summary="- separate `denseEx` experiment &#10;- fixed opic">
+      <created>1519715494587</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1519715494587</updated>
+    </task>
+    <task id="LOCAL-00030" summary="- up bash scripts">
+      <created>1519742190014</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1519742190014</updated>
+    </task>
+    <task id="LOCAL-00031" summary="- add max page rank to `denseEx.py`">
+      <created>1519829925846</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1519829925846</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -853,23 +955,23 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1920" height="1058" extended-state="6" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34886026" sideWeight="0.49041533" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29122055" sideWeight="0.7907348" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.253886" sideWeight="0.29073483" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30318472" sideWeight="0.481402" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15958549" sideWeight="0.33177084" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27948463" sideWeight="0.43610224" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2601036" sideWeight="0.5255591" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36791316" sideWeight="0.30543634" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28939545" sideWeight="0.4547391" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2601036" sideWeight="0.4744409" order="11" side_tool="true" content_ui="tabs" />
-      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18317358" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15495208" sideWeight="0.21831736" order="2" side_tool="false" content_ui="combo" x="72" y="78" width="250" height="693" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16012725" sideWeight="0.66822916" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13876967" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17811158" sideWeight="0.21831736" order="2" side_tool="false" content_ui="combo" x="72" y="78" width="250" height="693" />
       <window_info id="R Packages" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="R Graphics" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16453674" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1640625" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3359762" sideWeight="0.15228967" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -878,11 +980,40 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21618743" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="0" y="0" width="434" height="856" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21614583" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="0" y="0" width="434" height="856" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32905138" sideWeight="0.4978701" order="13" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30318472" sideWeight="0.481402" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14947917" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="R Graphics" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16453674" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3359762" sideWeight="0.15228967" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34886026" sideWeight="0.49041533" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21614583" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="0" y="0" width="434" height="856" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16012725" sideWeight="0.33177084" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27948463" sideWeight="0.43610224" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30318472" sideWeight="0.30543634" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28939545" sideWeight="0.4547391" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16012725" sideWeight="0.66822916" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14479166" sideWeight="0.21831736" order="2" side_tool="false" content_ui="combo" x="72" y="78" width="250" height="693" />
+      <window_info id="R Packages" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Concurrent Activities Diagram" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32905138" sideWeight="0.4978701" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -934,11 +1065,22 @@
     <MESSAGE value="Complete Paginated/Partial Query Responses.&#10;- Need to fix probability for picking nodes" />
     <MESSAGE value="update readme" />
     <MESSAGE value="del unrelated files" />
-    <option name="LAST_COMMIT_MESSAGE" value="del unrelated files" />
+    <MESSAGE value="after fix selected prob and modify OPIC, SB, PageRank, rand" />
+    <MESSAGE value="- separate `denseEx` experiment &#10;- fixed opic" />
+    <MESSAGE value="- up bash scripts" />
+    <MESSAGE value="- add max page rank to `denseEx.py`" />
+    <option name="LAST_COMMIT_MESSAGE" value="- add max page rank to `denseEx.py`" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="54" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sample_incomp.py</url>
+          <line>961</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="59" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
@@ -950,18 +1092,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/small_sample.py" />
-    <entry file="file://$PROJECT_DIR$/local_community.py" />
-    <entry file="file://$PROJECT_DIR$/inspect_graph.py" />
-    <entry file="file://$PROJECT_DIR$/hyptothesis_test.py" />
-    <entry file="file://$PROJECT_DIR$/calculate_syn_graph.py" />
-    <entry file="file://$PROJECT_DIR$/calculate_properties_from_sample_file.py" />
-    <entry file="file://$PROJECT_DIR$/run-properties.sh" />
-    <entry file="file://$PROJECT_DIR$/adjust_cc.py" />
-    <entry file="file://$PROJECT_DIR$/aggregate_files.py" />
-    <entry file="file://$PROJECT_DIR$/calculate_properties_step_syn.py" />
-    <entry file="file://$PROJECT_DIR$/log-small/rec-amazon_n.txt" />
-    <entry file="file://$PROJECT_DIR$/log-large/ca-citeseerexp_n.txt" />
     <entry file="file://$PROJECT_DIR$/summary.py" />
     <entry file="file://$PROJECT_DIR$/sim_edges.py" />
     <entry file="file://$PROJECT_DIR$/calculate_properties_step_real.py" />
@@ -980,13 +1110,6 @@
     <entry file="file://$PROJECT_DIR$/run-syn-step.sh" />
     <entry file="file://$PROJECT_DIR$/reconstuct_sample_syn.py" />
     <entry file="file://$PROJECT_DIR$/sample_multi.py" />
-    <entry file="file://$PROJECT_DIR$/run_multi_graph.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="19" lean-forward="true" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/run-syn-sample.sh" />
     <entry file="uml://JavaScript-modules-diagram//Volumes/GoogleDrive/My Drive/git/sampling_benchmark">
       <provider selected="true" editor-type-id="UmlEditorProvider">
@@ -1021,6 +1144,11 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+        </state>
+      </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="375">
@@ -1029,27 +1157,8 @@
           <second_editor />
         </state>
       </provider>
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/_mylib.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4080">
-          <caret line="272" column="28" lean-forward="false" selection-start-line="272" selection-start-column="4" selection-end-line="272" selection-end-column="28" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharm2017.3/python_stubs/348993582/__builtin__.py" />
-    <entry file="file://$PROJECT_DIR$/sample.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="1990" column="31" lean-forward="false" selection-start-line="1990" selection-start-column="26" selection-end-line="1990" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/R_code/R_code.Rproj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1072,50 +1181,96 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run_multi_graph_page.sh">
+    <entry file="file://$PROJECT_DIR$/sample_page.py" />
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="1" lean-forward="false" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="1" />
-          <folding />
+        <state relative-caret-position="0">
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run_multi_graph_page_mac.sh">
+    <entry file="file://$PROJECT_DIR$/log/ca-GrQc_partial_n.txt" />
+    <entry file="file://$PROJECT_DIR$/_mylib.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="26" column="4" lean-forward="true" selection-start-line="26" selection-start-column="4" selection-end-line="26" selection-end-column="4" />
-          <folding />
+        <state relative-caret-position="221">
+          <caret line="287" column="0" lean-forward="false" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="1496" column="38" lean-forward="true" selection-start-line="1496" selection-start-column="38" selection-end-line="1496" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/query.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="447">
-          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+        <state relative-caret-position="300">
+          <caret line="26" column="11" lean-forward="false" selection-start-line="26" selection-start-column="11" selection-end-line="26" selection-end-column="11" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sample_page.py">
+    <entry file="file://$PROJECT_DIR$/run_multi_graph.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="1020" column="33" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="2147" selection-end-column="0" />
+        <state relative-caret-position="425">
+          <caret line="25" column="83" lean-forward="false" selection-start-line="25" selection-start-column="82" selection-end-line="25" selection-end-column="83" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/log/avg-deg-15-com-300_e.txt" />
+    <entry file="file://$PROJECT_DIR$/log/avg-deg-100-com-1250_order.txt" />
+    <entry file="file://$PROJECT_DIR$/log.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1905">
+          <caret line="129" column="40" lean-forward="false" selection-start-line="129" selection-start-column="40" selection-end-line="129" selection-end-column="40" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/log/est-deg-1.txt" />
+    <entry file="file://$PROJECT_DIR$/log/est-deg-2.txt" />
+    <entry file="file://$PROJECT_DIR$/log/est-deg.txt" />
+    <entry file="file://$PROJECT_DIR$/run_page_node_limit.sh___jb_tmp___" />
+    <entry file="file://$PROJECT_DIR$/run_page_node_limit.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        <state relative-caret-position="425">
+          <caret line="25" column="4" lean-forward="true" selection-start-line="2" selection-start-column="0" selection-end-line="25" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_page_node_limit.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/denseEx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15255">
+          <caret line="1044" column="0" lean-forward="false" selection-start-line="1044" selection-start-column="0" selection-end-line="1045" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/run_multi_graph_page.sh" />
+    <entry file="file://$PROJECT_DIR$/run_multi_graph_page_mac.sh" />
+    <entry file="file://$PROJECT_DIR$/run_multi_graph_incomplete.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sample_incomp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="2128" column="35" lean-forward="true" selection-start-line="2128" selection-start-column="35" selection-end-line="2128" selection-end-column="35" />
+        <state relative-caret-position="305">
+          <caret line="830" column="0" lean-forward="false" selection-start-line="830" selection-start-column="0" selection-end-line="830" selection-end-column="0" />
           <folding />
         </state>
       </provider>
